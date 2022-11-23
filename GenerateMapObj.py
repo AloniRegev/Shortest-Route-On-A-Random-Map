@@ -6,7 +6,7 @@ from win32api import GetSystemMetrics
 
 
 MIN_NO_OF_VER=3
-
+MAX_NO_OF_VER=10
 
 class Map:
     def __init__(self):
@@ -65,7 +65,7 @@ class Map:
                     break
 
             if validPolyLoc:
-                polygonList.append(Polygon(self, centerPoint, randint(MIN_NO_OF_VER,10), radius))  # todo: change to dinemic numOfVertices
+                polygonList.append(Polygon(self, centerPoint, randint(MIN_NO_OF_VER,MAX_NO_OF_VER), radius))  # todo: change to dinemic numOfVertices
                 numOfPoly -= 1
 
         return polygonList
