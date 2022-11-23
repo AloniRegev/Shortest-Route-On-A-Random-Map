@@ -15,8 +15,7 @@ class Map:
         self.polygons = self.generatePolygons()
         self.startPoint = self.generatePoint()
         self.targetPoint = self.generatePoint()
-        # self.startPoint = (randint(0, self.weight), randint(0, self.height))
-        # self.targetPoint = (randint(0, self.weight), randint(0, self.height))
+
 
     # def __init__(self, height, weight):
     #     self.height = height
@@ -51,6 +50,13 @@ class Map:
         self.polygons = polygons
 
     def generatePolygons(self,maxRad=100):
+        """
+        Class function that generate polygon objects of the Map object.
+        It runs on the creation of a new Map object.
+
+        :param maxRad: maximum radius length from polygon center point to its vertexes.
+        :return: list of polygon of the self Map object.
+        """
         numOfPoly= randint(0,int(math.sqrt(self.weight/maxRad)*int(self.height/maxRad)))  # generate number of polygons in map
         polygonList=[]
 
@@ -71,6 +77,12 @@ class Map:
         return polygonList
 
     def generatePoint(self):
+        """
+        class function that generate point represented as a tuple on Map object.
+        It runs on the creation of a new Polygon object.
+
+        :return: tuple of X and Y coordination of a point in the Map object.
+        """
         point=(0,0)
         generFlag=True
         while generFlag:
@@ -124,6 +136,12 @@ class Polygon:
         self.vertices = vertices
 
     def generateVertices(self):
+        """
+        class function that generate polygon vertexes.
+        It runs on the creation of a new Polygon object.
+
+        :return: vertexes list of the self polygon object.
+        """
         direction = 0
         verticesList=[]
         for i in range(self.numOfVertices):
@@ -144,7 +162,11 @@ class Polygon:
         return verticesList
 
 def visualization(map):
+    """
+    Visualization of Map object.
 
+    :param map: Map object to show on plot.
+    """
     fig, ax = plt.subplots()
 
     ax.plot(map.startPoint[0], map.startPoint[1], 'o', color="magenta") # plot start point
