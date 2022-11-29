@@ -2,7 +2,8 @@ from random import randint
 import math
 import matplotlib.pyplot as plt
 from win32api import GetSystemMetrics
-
+import os
+from os import path
 
 
 MIN_NO_OF_VER=3
@@ -40,8 +41,20 @@ class Map:
     def getWeight(self):
         return self.weight
 
-    def setWeight(self, weight):
-        self.weight=weight
+    # def setWeight(self, weightMap):
+    #     self.weight=weightMap
+
+    def getStartPoint(self):
+        return self.startPoint
+
+    # def setStartPoint(self, startPoint):
+    #     self.startPoint=startPoint
+
+    def getEndPoint(self):
+        return self.targetPoint
+
+    def setEndPoint(self, targetPoint):
+        self.targetPoint=targetPoint
 
     def getPoly(self):
         return self.polygons
@@ -130,7 +143,7 @@ class Polygon:
         self.numOfVertices = num
 
     def getVertices(self):
-        return self.numOfVertices
+        return self.vertices
 
     def setVertices(self, vertices):
         self.vertices = vertices
@@ -187,8 +200,42 @@ def visualization(map):
     plt.show()
 
 
+def outputMaps(mapList):
+    outFile = open(path.join(os.getcwd(),"mapGenetrtor.txt"), "w", encoding='utf8') # overnight file
+    outFile.write("NOM {}\n".format(len(mapList))) #num of maps
+    outFile.close()
+
+    for i, map in enumerate(mapList):
+        outputMapAttributs(i, map)
+def outputMapAttributs(mapName, map):
+    outF = open(path.join(os.getcwd(),"mapGenetrtor.txt"), "a", encoding='utf8') # append to file
+
+    outF.write("M {}\n".format(mapName)) # map name
+    outF.write("W {}\n".format(map.getWeight())) # map weight
+    outF.write("H {}\n".format(map.getHeight())) # map height
+    outF.write("SP {}, {}\n".format(map.getStartPoint()[0], map.getStartPoint()[1])) # start point
+    outF.write("EP {}, {}\n".format(map.getEndPoint()[0],map.getEndPoint()[1])) # target point
+    outF.write("NOP {}\n".format(len(map.getPoly()))) #num Of Polygons
+    for polygonNum, polygon in enumerate(map.getPoly()):
+        outF.write("P {}\n".format(polygonNum)) # polygon name
+        outF.write("NOV {}\n".format(polygon.getNumVertices())) # num of vertxes of polygon
+        for vertex in polygon.getVertices():
+            outF.write("V {}, {}\n".format(vertex[0], vertex[1])) # vertex
+
+    outF.close()
+
+
 if __name__ == "__main__":
-    m=Map()
-    print("dim: (", m.weight,", ", m.height,")")
+    mapList=[]
+    m1=Map()
+    mapList.append(m1)
+    m2=Map()
+    mapList.append(m2)
     print("finish randomize")
-    visualization(m)
+    for m in mapList:
+        print("dim: (", m.weight,", ", m.height,")")
+        visualization(m)
+
+    outputMaps(mapList)
+
+
