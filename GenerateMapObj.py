@@ -97,7 +97,7 @@ class Map:
         :return: tuple of X and Y coordination of a point in the Map object.
         """
         point=(0,0)
-        generFlag=True
+        generFlag=True 
         while generFlag:
             point = (randint(0, self.weight), randint(0, self.height))
             generFlag=False
@@ -174,68 +174,105 @@ class Polygon:
 
         return verticesList
 
-def visualization(map):
-    """
-    Visualization of Map object.
 
-    :param map: Map object to show on plot.
-    """
-    fig, ax = plt.subplots()
-
-    ax.plot(map.startPoint[0], map.startPoint[1], 'o', color="magenta") # plot start point
-    ax.annotate("Start", map.startPoint) #print lable
-    ax.plot(map.targetPoint[0], map.targetPoint[1], 'o', color="magenta") # plot target point
-    ax.annotate("Target", map.targetPoint) #print lable
+class controlMenager:
+    mapList=[]
+    def __init__(self):
+        mapList=[]
 
 
-    #plot polygon representation
-    for poly in map.polygons:
-        ax.plot(poly.centerPoint[0], poly.centerPoint[1], 'o', color="black")
-        circlePlot=plt.Circle(poly.centerPoint, poly.maxRad,fill=False, color="green")
+    def addMap(self, map):
+        """
+        Add Map object to mapList.
 
-        ax.add_patch(circlePlot) #print circle
-        for ver in poly.vertices:
-            ax.plot(ver[0], ver[1], 'o', color="blue")
-    ax.set_aspect('equal')
-    plt.show()
+         :param map: Map object.
+        """
+        self.mapList.append(map)
+
+    def getMapList(self):
+        """
+        Get function to mapList.
+        """
+        return self.mapList
+
+    def visualMaps(self):
+        """
+        Visualization of each Map object from mapList one at a time using visualization metod.
+        """
+        for m in self.getMapList():
+            print("dim: (", m.weight,", ", m.height,")")
+            self.visualization(m)
+
+    def visualization(self, map):
+        """
+        Visualization of Map object.
+
+        :param map: Map object to show on plot.
+        """
+        fig, ax = plt.subplots()
+
+        ax.plot(map.startPoint[0], map.startPoint[1], 'o', color="magenta") # plot start point
+        ax.annotate("Start", map.startPoint) #print lable
+        ax.plot(map.targetPoint[0], map.targetPoint[1], 'o', color="magenta") # plot target point
+        ax.annotate("Target", map.targetPoint) #print lable
 
 
-def outputMaps(mapList):
-    outFile = open(path.join(os.getcwd(),"mapGenetrtor.txt"), "w", encoding='utf8') # overnight file
-    outFile.write("NOM {}\n".format(len(mapList))) #num of maps
-    outFile.close()
+        #plot polygon representation
+        for poly in map.polygons:
+            ax.plot(poly.centerPoint[0], poly.centerPoint[1], 'o', color="black")
+            circlePlot=plt.Circle(poly.centerPoint, poly.maxRad,fill=False, color="green")
 
-    for i, map in enumerate(mapList):
-        outputMapAttributs(i, map)
-def outputMapAttributs(mapName, map):
-    outF = open(path.join(os.getcwd(),"mapGenetrtor.txt"), "a", encoding='utf8') # append to file
+            ax.add_patch(circlePlot) #print circle
+            for ver in poly.vertices:
+                ax.plot(ver[0], ver[1], 'o', color="blue")
+        ax.set_aspect('equal')
+        plt.show()
 
-    outF.write("M {}\n".format(mapName)) # map name
-    outF.write("W {}\n".format(map.getWeight())) # map weight
-    outF.write("H {}\n".format(map.getHeight())) # map height
-    outF.write("SP {}, {}\n".format(map.getStartPoint()[0], map.getStartPoint()[1])) # start point
-    outF.write("EP {}, {}\n".format(map.getEndPoint()[0],map.getEndPoint()[1])) # target point
-    outF.write("NOP {}\n".format(len(map.getPoly()))) #num Of Polygons
-    for polygonNum, polygon in enumerate(map.getPoly()):
-        outF.write("P {}\n".format(polygonNum)) # polygon name
-        outF.write("NOV {}\n".format(polygon.getNumVertices())) # num of vertxes of polygon
-        for vertex in polygon.getVertices():
-            outF.write("V {}, {}\n".format(vertex[0], vertex[1])) # vertex
 
-    outF.close()
+    def outputMaps(self):
+        """
+        Creat input file for algoritem progrem to read. 
+        """
+
+        outFile = open(path.join(os.getcwd(),"mapGenetrtor.txt"), "w", encoding='utf8') # overnight file
+        outFile.write("NOM {}\n".format(len(self.mapList))) #num of maps
+        outFile.close()
+
+        for i, map in enumerate(self.mapList):
+            self.outputMapAttributs(i, map)
+
+
+    def outputMapAttributs(self, mapName, map):
+        """
+        Append map object for the input file to for algoritem program to read.
+
+        :param mapName: number of map in the list for loop tracking.
+        :param map: Map object to add to file.
+        """
+        outF = open(path.join(os.getcwd(),"mapGenetrtor.txt"), "a", encoding='utf8') # append to file
+
+        outF.write("W {}\n".format(map.getWeight())) # map weight
+        outF.write("H {}\n".format(map.getHeight())) # map height
+        outF.write("SP {} {}\n".format(map.getStartPoint()[0], map.getStartPoint()[1])) # start point
+        outF.write("EP {} {}\n".format(map.getEndPoint()[0],map.getEndPoint()[1])) # target point
+        outF.write("NOP {}\n".format(len(map.getPoly()))) #num Of Polygons
+        for polygonNum, polygon in enumerate(map.getPoly()):
+            outF.write("NOV {}\n".format(polygon.getNumVertices())) # num of vertxes of polygon
+            for vertex in polygon.getVertices():
+                outF.write("V {} {}\n".format(vertex[0], vertex[1])) # vertex
+            outF.write("P {}\n".format(polygonNum)) # polygon name
+
+        outF.write("M {}\n".format(mapName)) # map name
+
+
+        outF.close()
 
 
 if __name__ == "__main__":
-    mapList=[]
-    m1=Map()
-    mapList.append(m1)
-    m2=Map()
-    mapList.append(m2)
-    print("finish randomize")
-    for m in mapList:
-        print("dim: (", m.weight,", ", m.height,")")
-        visualization(m)
-
-    outputMaps(mapList)
+    control = controlMenager() # create control object for data passing
+    control.addMap(Map()) # add new random Map to Maplist
+    control.addMap(Map()) # add new random Map to Maplist
+    control.outputMaps() # creat output file for algoritem program to read
+    control.visualMaps() # visual all Maps in Maplist
 
 
