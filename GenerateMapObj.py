@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 from win32api import GetSystemMetrics
 import os
 from os import path
+from xml.etree.ElementTree import Element, SubElement, Comment, ElementTree, tostring
+# from ElementTree_pretty import prettify
+from xml.etree import ElementTree
+from xml.dom import minidom
 
 
 MIN_NO_OF_VER=3
@@ -228,45 +232,74 @@ class controlMenager:
         ax.set_aspect('equal')
         plt.show()
 
-
     def outputMaps(self):
         """
-        Creat input file for algoritem progrem to read. 
+        Create input XML file for algorithm program to read.
         """
+        root = Element("mapList")
+        nom = SubElement(root, "NOM")
+        nom.text = str(len(self.mapList))
 
-        outFile = open(path.join(os.getcwd(),"mapGenetrtor.txt"), "w", encoding='utf8') # overnight file
-        outFile.write("NOM {}\n".format(len(self.mapList))) #num of maps
-        outFile.close()
+        PolygonsXML = SubElement(root, "Polygons")
 
         for i, map in enumerate(self.mapList):
-            self.outputMapAttributs(i, map)
+            self.outputMapAttributs(i, map, PolygonsXML)
+
+        #write to file
+        outFile = open(path.join(os.getcwd(), "mapGenetrtor.xml"), "w", encoding='utf8')  # overnight file
+        for line in self.prettify(root).split("\n"):
+            outFile.write(line)
+
+        outFile.close()
 
 
-    def outputMapAttributs(self, mapName, map):
+    def outputMapAttributs(self, mapName, map, mapsXML):
         """
-        Append map object for the input file to for algoritem program to read.
+        Append map object for the input file to for algorithm program to read.
 
         :param mapName: number of map in the list for loop tracking.
         :param map: Map object to add to file.
         """
-        outF = open(path.join(os.getcwd(),"mapGenetrtor.txt"), "a", encoding='utf8') # append to file
+        mapXML = SubElement(mapsXML, 'Map', name=str(mapName))
+        weight = SubElement(mapXML, 'Weight')
+        weight.text = str(map.getWeight())
+        height = SubElement(mapXML, 'Height')
+        height.text = str(map.getHeight())
 
-        outF.write("W {}\n".format(map.getWeight())) # map weight
-        outF.write("H {}\n".format(map.getHeight())) # map height
-        outF.write("SP {} {}\n".format(map.getStartPoint()[0], map.getStartPoint()[1])) # start point
-        outF.write("EP {} {}\n".format(map.getEndPoint()[0],map.getEndPoint()[1])) # target point
-        outF.write("NOP {}\n".format(len(map.getPoly()))) #num Of Polygons
+        startPoint = SubElement(mapXML, 'StartPoint')
+        Xs = SubElement(startPoint, 'X')
+        Xs.text = str(map.getStartPoint()[0])
+        Ys = SubElement(startPoint, 'Y')
+        Ys.text = str(map.getStartPoint()[1])
+
+        targetPoint = SubElement(mapXML, 'TargetPoint')
+        Xs = SubElement(targetPoint, 'X')
+        Xs.text = str(map.getEndPoint()[0])
+        Ys = SubElement(targetPoint, 'Y')
+        Ys.text = str(map.getEndPoint()[1])
+
+        PolygonsXML = SubElement(mapXML, 'Polygons')
+
         for polygonNum, polygon in enumerate(map.getPoly()):
-            outF.write("NOV {}\n".format(polygon.getNumVertices())) # num of vertxes of polygon
-            for vertex in polygon.getVertices():
-                outF.write("V {} {}\n".format(vertex[0], vertex[1])) # vertex
-            outF.write("P {}\n".format(polygonNum)) # polygon name
+            PolygonXML = SubElement(PolygonsXML, 'Polygon', name=str(polygonNum))
 
-        outF.write("M {}\n".format(mapName)) # map name
+            vertexesXML = SubElement(PolygonXML, 'Vertexes')
+            for vertexName, vertex in enumerate(polygon.getVertices()):
+                vertexXML = SubElement(vertexesXML, 'Vertex', name=str(vertexName))
+                Xs=SubElement(vertexXML, 'X')
+                Xs.text = str(vertex[0])
+                Ys=SubElement(vertexXML, 'Y')
+                Ys.text = str(vertex[1])
 
 
-        outF.close()
+    def prettify(self, elem):
+        """Return a pretty-printed XML string for the Element.
 
+         :param elem: ElementTree object to convert to string.
+        """
+        rough_string = ElementTree.tostring(elem, 'utf-8')
+        reparsed = minidom.parseString(rough_string)
+        return reparsed.toprettyxml(indent="  ")
 
 if __name__ == "__main__":
     control = controlMenager() # create control object for data passing
