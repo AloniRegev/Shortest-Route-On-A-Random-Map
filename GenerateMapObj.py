@@ -5,7 +5,6 @@ from win32api import GetSystemMetrics
 import os
 from os import path
 from xml.etree.ElementTree import Element, SubElement, Comment, ElementTree, tostring
-# from ElementTree_pretty import prettify
 from xml.etree import ElementTree
 from xml.dom import minidom
 
@@ -237,10 +236,8 @@ class controlMenager:
         Create input XML file for algorithm program to read.
         """
         root = Element("mapList")
-        nom = SubElement(root, "NOM")
-        nom.text = str(len(self.mapList))
 
-        PolygonsXML = SubElement(root, "Polygons")
+        PolygonsXML = SubElement(root, "Maps")
 
         for i, map in enumerate(self.mapList):
             self.outputMapAttributs(i, map, PolygonsXML)
