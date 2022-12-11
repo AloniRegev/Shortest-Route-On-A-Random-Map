@@ -8,13 +8,16 @@ using namespace std;
 using namespace tinyxml2;
 
 class Polygon{
-    public:
-        Polygon(int numOfVertices, vector<tuple<int, int>> const& vec) : numOfVertices(numOfVertices), vetrexes(vec){};
-
     private:
         const int numOfVertices;
-        const vector<tuple<int, int>> vetrexes; 
+        const vector<tuple<int, int>> vetrexes;
+        const vector<tuple<tuple<int, int>,tuple<int, int>>> edges;
 
+    public:
+        Polygon(int numOfVertices, vector< tuple<int, int>>& vec) : numOfVertices(numOfVertices), vetrexes(vec) /*, edges(convexHull(vec))*/{};
+
+        vector<tuple<int, int>> getVerexes()const{return this->vetrexes;}
+        // vector<tuple<tuple<int, int>,tuple<int, int>>> convexHull(const vector<tuple<int, int>> vec) const; //todo implement
 };
 
 class Map{ 
@@ -23,8 +26,15 @@ class Map{
         const int height;
         const tuple<int, int> startPoint;
         const tuple<int, int> targetPoint;
-        const vector<Polygon> Polygons;
+        const vector<Polygon> polygons;
     
     public:
-        Map( int _weight,  int _height,  tuple<int, int> _startPoint,  tuple<int, int> _targetPoint,  vector<Polygon> _Polygons):weight(_weight), height(_height), startPoint(_startPoint), targetPoint(_targetPoint), Polygons(_Polygons){};
+        Map( int _weight,  int _height,  tuple<int, int> _startPoint,  tuple<int, int> _targetPoint,  vector<Polygon>& _polygons)
+            :weight(_weight), height(_height), startPoint(_startPoint), targetPoint(_targetPoint), polygons(_polygons){};
+
+        int getWeight()const{return this->weight;}
+        int getHeight()const{return this->height;}
+        tuple<int, int> getStartPoint()const{return this->startPoint;}
+        tuple<int, int> getTargetPoint()const{return this->targetPoint;}
+        vector<Polygon>  getPolygons()const{return this->polygons;}
 };

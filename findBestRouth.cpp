@@ -18,21 +18,21 @@ vector<Map> readInput(const char * inputFile){
             XMLElement *pPolygon= pMap -> FirstChildElement("Polygons") -> FirstChildElement("Polygon"); // pointer to the first polygon object data.
             while(pPolygon!=NULL){
                 /*get polygon object attributes*/
-                vector<tuple<int, int>> vetrexes;
+                vector<tuple<int, int>> vertexes;
                 
-                XMLElement *pVertex= pPolygon -> FirstChildElement("Vertexes") -> FirstChildElement("Vertex"); // pointer to the first verex data.
+                XMLElement *pVertex= pPolygon -> FirstChildElement("Vertexes") -> FirstChildElement("Vertex"); // pointer to the first vertex data.
                 while (pVertex!=NULL){
                     tuple<int, int> vertex = {atoi(pVertex->FirstChildElement("X")->GetText()), atoi(pVertex ->FirstChildElement("Y")->GetText())};
-                    vetrexes.push_back(vertex); // add new vertex to vertex List.
+                    vertexes.push_back(vertex); // add new vertex to vertex List.
 
                     pVertex = pVertex->NextSiblingElement("Vertex"); // move pointer to the next vertex data.
                 }
-                Polygon polygon= Polygon(vetrexes.size(), vetrexes); // creat new polygon object.
+                Polygon polygon= Polygon(vertexes.size(), vertexes); // create new polygon object.
                 polygons.push_back(polygon); // add new polygon to polygon List.
 
                 pPolygon = pPolygon->NextSiblingElement("Polygon"); // move pointer to the next polygon object data.
             }
-            Map map= Map(weight, height, startPoint, targetPoint, polygons); // creat new map object.
+            Map map= Map(weight, height, startPoint, targetPoint, polygons); // create new map object.
             maps.push_back(map); // add new map object to mapList. 
 
             pMap = pMap->NextSiblingElement("Map"); // move pointer to the next polygon object data.
@@ -42,12 +42,9 @@ vector<Map> readInput(const char * inputFile){
 }
 
 int main(int argc, char *argv[]){
-    // ifstream inputFile(argv[1]); // input read file
-    // ifstream MyReadFile("C:\\Code\\GitHub\\Shortest-Route-On-A-Random-Map\\mapGenetrtor.txt"); // input read file
-    const char * path = argv[1];
-    // const char * path = "C:\\Code\\GitHub\\Shortest-Route-On-A-Random-Map\\mapGenetrtor.exe";
+    const char * path = argv[1]; // input read file
+    // const char * path = "C:\\Code\\GitHub\\Shortest-Route-On-A-Random-Map\\mapGenerator.exe";
 
-    readInput(path);
-   
-
+    vector<Map> mapList= readInput(path);
+    std::cout<< get<0>(mapList[0].getStartPoint()) <<" "<<get<1>(mapList[0].getStartPoint()) <<std::endl;
 }
