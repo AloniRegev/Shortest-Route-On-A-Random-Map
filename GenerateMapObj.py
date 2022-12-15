@@ -14,12 +14,28 @@ MAX_NO_OF_VER = 10
 
 
 class Map:
-    def __init__(self):
+    def __init__(self, state="random"):
+        """
+
+        :param state: set the start_point and target_point randomly or fixed.
+
+        If set to "random" then it wil generate random points.
+        If set to "debug" then it fix the
+            start_point to (0, 0) (bottom left corner)
+            and target_point to (max_weight, max_height) (top right corner).
+        It set to "random" by default.
+        """
+
         self.weight = randint(0, GetSystemMetrics(0))
         self.height = randint(0, GetSystemMetrics(1))
         self.polygons = self.generate_polygons()
-        self.start_point = self.generate_point()
-        self.targetPoint = self.generate_point()
+        if state == "random":
+            self.start_point = self.generate_point()
+            self.target_point = self.generate_point()
+
+        elif state == "debug":
+            self.start_point = (0, 0)
+            self.target_point = (self.weight, self.height)
 
     # def __init__(self, height, weight):
     #     self.height = height
@@ -53,11 +69,11 @@ class Map:
     # def set_start_point(self, start_point):
     #     self.start_point=start_point
 
-    def get_end_point(self):
-        return self.targetPoint
+    def get_target_point(self):
+        return self.target_point
 
-    def set_end_point(self, target_point):
-        self.targetPoint = target_point
+    def set_target_point(self, target_point):
+        self.target_point = target_point
 
     def get_poly(self):
         return self.polygons
@@ -223,8 +239,8 @@ class ControlManager:
 
         ax.plot(_map.start_point[0], _map.start_point[1], 'o', color="magenta")  # plot start point
         ax.annotate("Start", _map.start_point)  # print label
-        ax.plot(_map.targetPoint[0], _map.targetPoint[1], 'o', color="magenta")  # plot target point
-        ax.annotate("Target", _map.targetPoint)  # print label
+        ax.plot(_map.target_point[0], _map.target_point[1], 'o', color="magenta")  # plot target point
+        ax.annotate("Target", _map.target_point)  # print label
 
         # plot polygon representation
         for poly in _map.polygons:
@@ -270,7 +286,7 @@ class ControlManager:
         height = SubElement(map_xml, 'Height')
         height.text = str(_map.get_height())
 
-        start_point = SubElement(map_xml, 'start_point')
+        start_point = SubElement(map_xml, 'StartPoint')
         xs = SubElement(start_point, 'X')
         xs.text = str(_map.get_start_point()[0])
         ys = SubElement(start_point, 'Y')
@@ -278,9 +294,9 @@ class ControlManager:
 
         target_point = SubElement(map_xml, 'TargetPoint')
         xs = SubElement(target_point, 'X')
-        xs.text = str(_map.get_end_point()[0])
+        xs.text = str(_map.get_target_point()[0])
         ys = SubElement(target_point, 'Y')
-        ys.text = str(_map.get_end_point()[1])
+        ys.text = str(_map.get_target_point()[1])
 
         polygons_xml = SubElement(map_xml, 'Polygons')
 
@@ -303,12 +319,12 @@ class ControlManager:
         """
         rough_string = ElementTree.tostring(elem, encoding='unicode')
         reparse = minidom.parseString(rough_string)
-        return reparse .toprettyxml(indent="  ")
+        return reparse.toprettyxml(indent="  ")
 
 
 if __name__ == "__main__":
     control = ControlManager()  # create control object for data passing
-    control.add_map(Map())      # add new random Map to map_list
-    control.add_map(Map())      # add new random Map to map_list
-    control.output_maps()       # create output file for algorithm program to read
-    control.visual_maps()       # visual all Maps in map_list
+    control.add_map(Map(state="debug"))  # add new random Map to map_list
+    control.add_map(Map(state="debug"))  # add new random Map to map_list
+    control.output_maps()  # create output file for algorithm program to read
+    control.visual_maps()  # visual all Maps in map_list

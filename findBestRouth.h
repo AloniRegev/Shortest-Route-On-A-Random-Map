@@ -10,13 +10,13 @@ using namespace tinyxml2;
 class Polygon{
     private:
         const int numOfVertices;
-        const vector<tuple<int, int>> vetrexes;
-        const vector<tuple<tuple<int, int>,tuple<int, int>>> edges;
+        const vector<tuple<int, int>> vetrexes; //todo replace withe point class object
+        const vector<tuple<tuple<int, int>,tuple<int, int>>> edges;//todo replace withe point class object
 
     public:
         Polygon(int numOfVertices, vector< tuple<int, int>>& vec) : numOfVertices(numOfVertices), vetrexes(vec) /*, edges(convexHull(vec))*/{};
 
-        vector<tuple<int, int>> getVerexes()const{return this->vetrexes;}
+        vector<tuple<int, int>> getVerexes()const{return this->vetrexes;} //todo replace withe point class object
         // vector<tuple<tuple<int, int>,tuple<int, int>>> convexHull(const vector<tuple<int, int>> vec) const; //todo implement
 };
 
@@ -24,8 +24,8 @@ class Map{
     private:
         const int weight;
         const int height;
-        const tuple<int, int> startPoint;
-        const tuple<int, int> targetPoint;
+        const tuple<int, int> startPoint; //todo replace withe point class object
+        const tuple<int, int> targetPoint; //todo replace withe point class object
         const vector<Polygon> polygons;
     
     public:
