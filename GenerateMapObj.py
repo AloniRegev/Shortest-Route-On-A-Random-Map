@@ -1,6 +1,7 @@
 import math
 import os
 from os import path
+import subprocess
 from random import randint
 from xml.dom import minidom
 from xml.etree import ElementTree
@@ -253,9 +254,11 @@ class ControlManager:
         ax.set_aspect('equal')
         plt.show()
 
-    def output_maps(self):
+    def output_maps(self, _xml_name="mapGenerator.xml"):
         """
         Create input XML file for algorithm program to read.
+
+        :param _xml_name: name of the xml file to be created that stores the objects' data.
         """
         root = Element("map_list")
 
@@ -265,7 +268,7 @@ class ControlManager:
             self.output_map_attributes(i, _map, polygons_xml)
 
         # write to file
-        out_file = open(path.join(os.getcwd(), "mapGenerator.xml"), "w", encoding='utf8')  # overnight file
+        out_file = open(path.join(os.getcwd(), _xml_name), "w", encoding='utf8')  # overnight file
         for line in self.prettify(root).split("\n"):
             out_file.write(line)
 
@@ -313,18 +316,38 @@ class ControlManager:
 
     @staticmethod
     def prettify(elem):
-        """Return a pretty-printed XML string for the Element.
+        """
+        Return a pretty-printed XML string for the Element.
 
-         :param elem: ElementTree object to convert to string.
+        :param elem: ElementTree object to convert to string.
         """
         rough_string = ElementTree.tostring(elem, encoding='unicode')
         reparse = minidom.parseString(rough_string)
         return reparse.toprettyxml(indent="  ")
 
+    @staticmethod
+    def run_cpp(_xml_name="mapGenerator.xml"):
+        """
+        function that creates the xml input file for the algorithm program, compile  the algorithm program cpp file
+        and runs it with it's xml as input.
+
+        :param _xml_name: name for the xml file to be created as the input file of the algorithm program.
+        """
+
+        control.output_maps(_xml_name)
+        if os.system("g++ -g -Wall -o findBestRouth  findBestRouth.cpp") == 0:  # todo replace it with makefile call
+            try:
+                proc = subprocess.Popen(["./findBestRouth", _xml_name])
+
+            except:
+                raise Exception("Cannot run \"findBestRouth.exe\" file.")
+        else:
+            raise Exception("Cannot compile \"findBestRouth.cpp\" file.")
+
 
 if __name__ == "__main__":
-    control = ControlManager()  # create control object for data passing
-    control.add_map(Map(state="debug"))  # add new random Map to map_list
-    control.add_map(Map(state="debug"))  # add new random Map to map_list
-    control.output_maps()  # create output file for algorithm program to read
-    control.visual_maps()  # visual all Maps in map_list
+    control = ControlManager()              # create control object for data passing
+    control.add_map(Map(state="debug"))     # add new random Map to map_list
+    control.add_map(Map(state="debug"))     # add new random Map to map_list
+    control.visual_maps()                   # visual all Maps in map_list
+    control.run_cpp()                       # create input file ,compile the algorithm program and runs it.

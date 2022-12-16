@@ -11,18 +11,18 @@ vector<Map> readInput(const char * inputFile){
             /*get map object attributes*/
             int weight = atoi(pMap -> FirstChildElement("Weight")->GetText());
             int height = atoi(pMap -> FirstChildElement("Height")->GetText());
-            tuple<int, int> startPoint = {atoi(pMap ->FirstChildElement("StartPoint")->FirstChildElement("X")->GetText()), atoi(pMap ->FirstChildElement("StartPoint")-> FirstChildElement("Y")->GetText())}; //todo replace withe point class object
-            tuple<int, int> targetPoint = {atoi(pMap ->FirstChildElement("TargetPoint")->FirstChildElement("X")->GetText()), atoi(pMap ->FirstChildElement("TargetPoint")-> FirstChildElement("Y")->GetText())}; //todo replace withe point class object
+            Point startPoint = Point(atoi(pMap ->FirstChildElement("StartPoint")->FirstChildElement("X")->GetText()), atoi(pMap ->FirstChildElement("StartPoint")-> FirstChildElement("Y")->GetText()));
+            Point targetPoint = Point(atoi(pMap ->FirstChildElement("TargetPoint")->FirstChildElement("X")->GetText()), atoi(pMap ->FirstChildElement("TargetPoint")-> FirstChildElement("Y")->GetText()));
             vector<Polygon> polygons;
 
             XMLElement *pPolygon= pMap -> FirstChildElement("Polygons") -> FirstChildElement("Polygon"); // pointer to the first polygon object data.
             while(pPolygon!=NULL){
                 /*get polygon object attributes*/
-                vector<tuple<int, int>> vertexes;
+                vector<Point> vertexes;
                 
                 XMLElement *pVertex= pPolygon -> FirstChildElement("Vertexes") -> FirstChildElement("Vertex"); // pointer to the first vertex data.
                 while (pVertex!=NULL){
-                    tuple<int, int> vertex = {atoi(pVertex->FirstChildElement("X")->GetText()), atoi(pVertex ->FirstChildElement("Y")->GetText())}; //todo replace withe point class object
+                    Point vertex = Point(atoi(pVertex->FirstChildElement("X")->GetText()), atoi(pVertex ->FirstChildElement("Y")->GetText()));
                     vertexes.push_back(vertex); // add new vertex to vertex List.
 
                     pVertex = pVertex->NextSiblingElement("Vertex"); // move pointer to the next vertex data.
@@ -46,5 +46,5 @@ int main(int argc, char *argv[]){
     // const char * path = "C:\\Code\\GitHub\\Shortest-Route-On-A-Random-Map\\mapGenerator.exe";
 
     vector<Map> mapList= readInput(path);
-    std::cout<< get<0>(mapList[0].getTargetPoint()) <<" "<<get<1>(mapList[0].getTargetPoint()) <<std::endl;
+    std::cout<<mapList[0].getTargetPoint().getX() <<" "<<mapList[0].getTargetPoint().getY() <<std::endl;
 }

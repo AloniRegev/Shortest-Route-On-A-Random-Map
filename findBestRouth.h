@@ -7,16 +7,30 @@
 using namespace std;
 using namespace tinyxml2;
 
+class Point{
+    private:
+        const int x;
+        const int y;
+
+    public:
+        Point(int x, int y) : x(x), y(y) {};
+
+         int getX()const{return this->x;}
+         int getY()const{return this->y;}
+//         int toString(){return to_string(x)+" ,"}
+
+};
+
 class Polygon{
     private:
         const int numOfVertices;
-        const vector<tuple<int, int>> vetrexes; //todo replace withe point class object
-        const vector<tuple<tuple<int, int>,tuple<int, int>>> edges;//todo replace withe point class object
+        const vector<Point> vertexes;
+        const vector<tuple<Point,Point>> edges;
 
     public:
-        Polygon(int numOfVertices, vector< tuple<int, int>>& vec) : numOfVertices(numOfVertices), vetrexes(vec) /*, edges(convexHull(vec))*/{};
+        Polygon(int numOfVertices, vector< Point>& vec) : numOfVertices(numOfVertices), vertexes(vec) /*, edges(convexHull(vec))*/{};
 
-        vector<tuple<int, int>> getVerexes()const{return this->vetrexes;} //todo replace withe point class object
+        vector<Point> getVertexes()const{return this->vertexes;}
         // vector<tuple<tuple<int, int>,tuple<int, int>>> convexHull(const vector<tuple<int, int>> vec) const; //todo implement
 };
 
@@ -24,17 +38,18 @@ class Map{
     private:
         const int weight;
         const int height;
-        const tuple<int, int> startPoint; //todo replace withe point class object
-        const tuple<int, int> targetPoint; //todo replace withe point class object
+        const Point startPoint;
+        const Point targetPoint;
         const vector<Polygon> polygons;
     
     public:
-        Map( int _weight,  int _height,  tuple<int, int> _startPoint,  tuple<int, int> _targetPoint,  vector<Polygon>& _polygons)
+        Map( int _weight,  int _height,  Point _startPoint,  Point _targetPoint,  vector<Polygon>& _polygons)
             :weight(_weight), height(_height), startPoint(_startPoint), targetPoint(_targetPoint), polygons(_polygons){};
 
         int getWeight()const{return this->weight;}
         int getHeight()const{return this->height;}
-        tuple<int, int> getStartPoint()const{return this->startPoint;}
-        tuple<int, int> getTargetPoint()const{return this->targetPoint;}
+        Point getStartPoint()const{return this->startPoint;}
+        Point getTargetPoint()const{return this->targetPoint;}
         vector<Polygon>  getPolygons()const{return this->polygons;}
 };
+
