@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <vector>
 #include <tuple>
@@ -17,7 +18,7 @@ class Point{
 
          int getX()const{return this->x;}
          int getY()const{return this->y;}
-//         int toString(){return to_string(x)+" ,"}
+         string toString(){return "("+to_string(getX())+", "+to_string(getY())+")";}
 
 };
 

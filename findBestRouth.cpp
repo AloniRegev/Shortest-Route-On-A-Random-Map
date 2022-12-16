@@ -46,5 +46,5 @@ int main(int argc, char *argv[]){
     // const char * path = "C:\\Code\\GitHub\\Shortest-Route-On-A-Random-Map\\mapGenerator.exe";
 
     vector<Map> mapList= readInput(path);
-    std::cout<<mapList[0].getTargetPoint().getX() <<" "<<mapList[0].getTargetPoint().getY() <<std::endl;
+    std::cout<<mapList[0].getTargetPoint().toString() <<std::endl;
 }
