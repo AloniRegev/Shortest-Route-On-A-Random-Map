@@ -333,21 +333,22 @@ class ControlManager:
 
         :param _xml_name: name for the xml file to be created as the input file of the algorithm program.
         """
+        control.output_maps(_xml_name)  # create input file for the algorithm program.
+        try:
+            os.system("make")  # compile algorithm program c++ file.
 
-        control.output_maps(_xml_name)
-        if os.system("g++ -g -Wall -o findBestRouth  findBestRouth.cpp") == 0:  # todo replace it with makefile call
             try:
-                proc = subprocess.Popen(["./findBestRouth", _xml_name])
-
+                subprocess.Popen(["./findBestRouth", _xml_name])  # run the algorithm program
             except:
                 raise Exception("Cannot run \"findBestRouth.exe\" file.")
-        else:
+
+        except:
             raise Exception("Cannot compile \"findBestRouth.cpp\" file.")
 
 
 if __name__ == "__main__":
-    control = ControlManager()              # create control object for data passing
-    control.add_map(Map(state="debug"))     # add new random Map to map_list
-    control.add_map(Map(state="debug"))     # add new random Map to map_list
-    control.visual_maps()                   # visual all Maps in map_list
-    control.run_cpp()                       # create input file ,compile the algorithm program and runs it.
+    control = ControlManager()  # create control object for data passing
+    control.add_map(Map(state="debug"))  # add new random Map to map_list
+    control.add_map(Map(state="debug"))  # add new random Map to map_list
+    control.visual_maps()  # visual all Maps in map_list
+    control.run_cpp()  # create input file ,compile the algorithm program and runs it.

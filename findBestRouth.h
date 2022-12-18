@@ -51,6 +51,6 @@ class Map{
         int getHeight()const{return this->height;}
         Point getStartPoint()const{return this->startPoint;}
         Point getTargetPoint()const{return this->targetPoint;}
-        vector<Polygon>  getPolygons()const{return this->polygons;}
+        vector<Polygon> getPolygons()const{return this->polygons;}
 };
 
