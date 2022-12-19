@@ -1,9 +1,9 @@
-#include "findBestRouth.h"
-vector<Map> readInput(const char * inputFile){
+#include "ControlManager.h"
+
+void ControlManager::readInput(char * inputFile){
     XMLDocument doc;
     doc.LoadFile(inputFile);
     XMLElement *pRootElement = doc.RootElement();
-    vector<Map> maps;
 
     if (pRootElement != NULL) {
         XMLElement *pMap= pRootElement -> FirstChildElement("Maps")-> FirstChildElement("Map"); // pointer to the first map object data.
@@ -13,12 +13,12 @@ vector<Map> readInput(const char * inputFile){
             int height = atoi(pMap -> FirstChildElement("Height")->GetText());
             Point startPoint = Point(atoi(pMap ->FirstChildElement("StartPoint")->FirstChildElement("X")->GetText()), atoi(pMap ->FirstChildElement("StartPoint")-> FirstChildElement("Y")->GetText()));
             Point targetPoint = Point(atoi(pMap ->FirstChildElement("TargetPoint")->FirstChildElement("X")->GetText()), atoi(pMap ->FirstChildElement("TargetPoint")-> FirstChildElement("Y")->GetText()));
-            vector<Polygon> polygons;
+            std::vector<Polygon> polygons;
 
             XMLElement *pPolygon= pMap -> FirstChildElement("Polygons") -> FirstChildElement("Polygon"); // pointer to the first polygon object data.
             while(pPolygon!=NULL){
                 /*get polygon object attributes*/
-                vector<Point> vertexes;
+                std::vector<Point> vertexes;
                 
                 XMLElement *pVertex= pPolygon -> FirstChildElement("Vertexes") -> FirstChildElement("Vertex"); // pointer to the first vertex data.
                 while (pVertex!=NULL){
@@ -38,13 +38,9 @@ vector<Map> readInput(const char * inputFile){
             pMap = pMap->NextSiblingElement("Map"); // move pointer to the next polygon object data.
         }
     }
-        return maps;
 }
 
-int main(int argc, char *argv[]){
-    const char * path = argv[1]; // input read file
-    // const char * path = "C:\\Code\\GitHub\\Shortest-Route-On-A-Random-Map\\mapGenerator.exe";
-
-    vector<Map> mapList= readInput(path);
-    std::cout<<mapList[0].getTargetPoint().toString() <<std::endl;
+void ConvexHull(){
+    
 }
+
