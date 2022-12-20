@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <stack>
 #include <tuple>
 #include "./tinyxml2/tinyxml2.cpp"
 #include "Map.h"
@@ -12,9 +13,10 @@ using namespace tinyxml2;
 class ControlManager{
 private:
     std::vector<Map> maps;
-public:
-    void readInput(char * inputFile);
+    int orientation(Point p, Point q, Point r);
+    std::vector<Point> ConvexHull(std::vector<Point> points);   
 
+public:
     std::vector<Map> getMaps(){return this->maps;}
-    
+    void readInput(const char * inputFile);
 };

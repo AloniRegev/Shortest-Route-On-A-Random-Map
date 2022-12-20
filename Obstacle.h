@@ -1,7 +1,7 @@
 #include <vector>
 #include "Polygon.h"
 
-class Obstacle : private Polygon{
+class Obstacle : public Polygon{
     private:
         const std::vector<Point> convexVertexes;
 
