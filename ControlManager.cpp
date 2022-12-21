@@ -1,8 +1,8 @@
 #include "ControlManager.h"
 
-void ControlManager::readInput(const char * inputFile){
+void ControlManager::readInput(const char * path){
     XMLDocument doc;
-    doc.LoadFile(inputFile);
+    doc.LoadFile(path);
     XMLElement *pRootElement = doc.RootElement();
 
     if (pRootElement != NULL) {
@@ -42,6 +42,85 @@ void ControlManager::readInput(const char * inputFile){
         }
     }
 }
+
+void ControlManager::createOutput(const char * path){
+    XMLDocument doc;
+    XMLElement * pRoot = doc.NewElement("Root");
+    doc.InsertFirstChild(pRoot);
+    XMLElement * pMaps = doc.NewElement("Maps");
+    pMaps->SetAttribute("size", maps.size());
+    // // doc.InsertFirstChild(pMaps);
+    // pRoot -> InsertEndChild(pMaps);
+
+    maps=getMaps();
+    for(int i=0; i<(int)maps.size(); i++){
+        XMLElement * pMap = doc.NewElement("Map");
+        pMap->SetAttribute("name", i);
+
+            //insert weight value
+            XMLElement * pWeight = doc.NewElement("Weight");
+            pWeight->SetText(maps[i].getWeight());
+            pMap->InsertEndChild(pWeight);
+
+            //insert height value
+            XMLElement * pHeight = doc.NewElement("Height");
+            pHeight->SetText(maps[i].getHeight());
+            pMap->InsertEndChild(pHeight);
+
+            //insert start point
+            XMLElement * pStartPoint = doc.NewElement("StartPoint");
+            XMLElement *  pX= doc.NewElement("X");
+            pX->SetText(maps[i].getStartPoint().getX());
+            pStartPoint->InsertEndChild(pX);
+            XMLElement *  pY= doc.NewElement("Y");
+            pY->SetText(maps[i].getStartPoint().getY());
+            pStartPoint->InsertEndChild(pY);
+            pMap->InsertEndChild(pStartPoint);
+
+            //insert target point
+            XMLElement * pTargetPoint = doc.NewElement("TargetPoint");
+            pX= doc.NewElement("X");
+            pX->SetText(maps[i].getTargetPoint().getX());
+            pTargetPoint->InsertEndChild(pX);
+            pY= doc.NewElement("Y");
+            pY->SetText(maps[i].getTargetPoint().getY());
+            pTargetPoint->InsertEndChild(pY);
+            pMap->InsertEndChild(pTargetPoint);
+
+            //insert obsticals;
+            XMLElement * pObsticals = doc.NewElement("Obsticals");
+            pObsticals->SetAttribute("size", (int) maps[i].getObstacles().size());
+            for(int j=0; j<(int) maps[i].getObstacles().size(); j++){
+                XMLElement * pObstical = doc.NewElement("Obstical");
+                pObstical->SetAttribute("name", j);
+
+                XMLElement * pVertexes = doc.NewElement("Vertexes");
+                pVertexes->SetAttribute("size", (int) maps[i].getObstacles()[j].getConvexVertexes().size());
+                for(int k=0; k<(int) maps[i].getObstacles()[j].getConvexVertexes().size(); k++){
+                    XMLElement * pVertex = doc.NewElement("Vertex");
+                    pVertex->SetAttribute("name", k);
+
+                        pX= doc.NewElement("X");
+                        pX->SetText(maps[i].getObstacles()[j].getConvexVertexes()[k].getX());
+                        pVertex->InsertEndChild(pX);
+                        pY= doc.NewElement("Y");
+                        pY->SetText(maps[i].getObstacles()[j].getConvexVertexes()[k].getY());
+                        pVertex->InsertEndChild(pY);
+                    
+                    pVertexes->InsertEndChild(pVertex);
+                }
+                pObstical->InsertEndChild(pVertexes);
+                pObsticals->InsertEndChild(pObstical);
+            }
+            pMap->InsertEndChild(pObsticals);
+
+        pMaps->InsertEndChild(pMap);
+    }
+        pRoot->InsertEndChild(pMaps);
+
+    doc.SaveFile(path);    
+}
+
 
 // Big cradit for GeeksforGeeks for there algorithem implementation.
 std::vector<Point> ControlManager::ConvexHull(std::vector<Point> points){

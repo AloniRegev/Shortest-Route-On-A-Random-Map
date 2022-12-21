@@ -24,4 +24,6 @@ int main(int argc,const char *argv[]){
 
     std::cout<<"\ntarget point"<<std::endl;
     std::cout<<control.getMaps()[0].getTargetPoint().toString() <<std::endl;
+
+    control.createOutput(".\\algoritemOutput.xml");
 }

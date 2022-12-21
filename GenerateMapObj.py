@@ -260,9 +260,8 @@ class ControlManager:
 
         :param _xml_name: name of the xml file to be created that stores the objects' data.
         """
-        root = Element("map_list")
-
-        polygons_xml = SubElement(root, "Maps")
+        root=Element("Root")
+        polygons_xml = SubElement(root, "Maps", size=str(len(self.map_list)))
 
         for i, _map in enumerate(self.map_list):
             self.output_map_attributes(i, _map, polygons_xml)
@@ -301,12 +300,12 @@ class ControlManager:
         ys = SubElement(target_point, 'Y')
         ys.text = str(_map.get_target_point()[1])
 
-        polygons_xml = SubElement(map_xml, 'Polygons')
+        polygons_xml = SubElement(map_xml, 'Polygons', size=str(len(_map.get_poly())))
 
         for polygonNum, polygon in enumerate(_map.get_poly()):
             polygon_xml = SubElement(polygons_xml, 'Polygon', name=str(polygonNum))
 
-            vertexes_xml = SubElement(polygon_xml, 'Vertexes')
+            vertexes_xml = SubElement(polygon_xml, 'Vertexes', size=str(len(polygon.get_vertices())))
             for vertexName, vertex in enumerate(polygon.get_vertices()):
                 vertex_xml = SubElement(vertexes_xml, 'Vertex', name=str(vertexName))
                 xs = SubElement(vertex_xml, 'X')

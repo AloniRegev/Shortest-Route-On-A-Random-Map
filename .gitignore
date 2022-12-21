@@ -6,3 +6,4 @@ mapGenerator.xml
 Examples/class_diagram.drawio
 *.o
 .vscode/tasks.json
+*.xml

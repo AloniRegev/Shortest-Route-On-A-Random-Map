@@ -5,6 +5,7 @@
 #include <stack>
 #include <tuple>
 #include "./tinyxml2/tinyxml2.cpp"
+#include "./tinyxml2/tinyxml2.h"
 #include "Map.h"
 
 
@@ -18,5 +19,6 @@ private:
 
 public:
     std::vector<Map> getMaps(){return this->maps;}
-    void readInput(const char * inputFile);
+    void readInput(const char * path);
+    void createOutput(const char * path);
 };
