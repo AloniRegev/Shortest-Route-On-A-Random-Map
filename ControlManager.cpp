@@ -87,12 +87,12 @@ void ControlManager::createOutput(const char * path){
             pTargetPoint->InsertEndChild(pY);
             pMap->InsertEndChild(pTargetPoint);
 
-            //insert obsticals;
-            XMLElement * pObsticals = doc.NewElement("Obsticals");
-            pObsticals->SetAttribute("size", (int) maps[i].getObstacles().size());
+            //insert obstacle;
+            XMLElement * pObstacles = doc.NewElement("Obstacles");
+            pObstacles->SetAttribute("size", (int) maps[i].getObstacles().size());
             for(int j=0; j<(int) maps[i].getObstacles().size(); j++){
-                XMLElement * pObstical = doc.NewElement("Obstical");
-                pObstical->SetAttribute("name", j);
+                XMLElement * pObstacle = doc.NewElement("Obstacle");
+                pObstacle->SetAttribute("name", j);
 
                 XMLElement * pVertexes = doc.NewElement("Vertexes");
                 pVertexes->SetAttribute("size", (int) maps[i].getObstacles()[j].getConvexVertexes().size());
@@ -109,10 +109,10 @@ void ControlManager::createOutput(const char * path){
                     
                     pVertexes->InsertEndChild(pVertex);
                 }
-                pObstical->InsertEndChild(pVertexes);
-                pObsticals->InsertEndChild(pObstical);
+                pObstacle->InsertEndChild(pVertexes);
+                pObstacles->InsertEndChild(pObstacle);
             }
-            pMap->InsertEndChild(pObsticals);
+            pMap->InsertEndChild(pObstacles);
 
         pMaps->InsertEndChild(pMap);
     }
@@ -122,7 +122,7 @@ void ControlManager::createOutput(const char * path){
 }
 
 
-// Big cradit for GeeksforGeeks for there algorithem implementation.
+// Big credit for Geeks-for-Geeks for there algorithm implementation.
 std::vector<Point> ControlManager::ConvexHull(std::vector<Point> points){
     // There must be at least 3 points
     int n = points.size();
@@ -148,8 +148,8 @@ std::vector<Point> ControlManager::ConvexHull(std::vector<Point> points){
   
         // Search for a point 'q' such that orientation(p, q,
         // x) is counterclockwise for all points 'x'. The idea
-        // is to keep track of last visited most counterclock-
-        // wise point in q. If any point 'i' is more counterclock-
+        // is to keep track of last visited most counterclockwise-
+        // wise point in q. If any point 'i' is more counterclockwise-
         // wise than q, then update q.
         q = (p+1)%n;
         for (int i = 0; i < n; i++)
@@ -177,5 +177,5 @@ int ControlManager::orientation(Point p, Point q, Point r)
               (q.getX() - p.getX()) * (r.getY() - q.getY());
   
     if (val == 0) return 0;  // collinear
-    return (val > 0)? 1: 2; // clock or counterclock wise
+    return (val > 0)? 1: 2; // clock or counterclockwise wise
 }
