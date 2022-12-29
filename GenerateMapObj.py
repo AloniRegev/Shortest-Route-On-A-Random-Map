@@ -14,6 +14,20 @@ MIN_NO_OF_VER = 3
 MAX_NO_OF_VER = 10
 
 
+class Point:
+    def __init__(self, coordinates, line_of_sight=None):
+        self.coordinates = coordinates
+        if line_of_sight:
+            self.line_of_sight = line_of_sight
+        else:
+            self.line_of_sight = []
+
+    def get_coordinates(self):
+        return self.coordinates
+
+    def get_line_of_sight(self):
+        return self.line_of_sight
+
 class Map:
     def __init__(self, _weight=None, _height=None, _start_point=None, _target_point=None, _polygons=None,
                  state="random"):
@@ -54,8 +68,8 @@ class Map:
                 self.target_point = self.generate_point()
 
             elif state == "debug":
-                self.start_point = (0, 0)
-                self.target_point = (self.weight, self.height)
+                self.start_point = Point((0, 0))
+                self.target_point = Point((self.weight, self.height))
         else:
             self.start_point = _start_point
             self.target_point = _target_point
@@ -102,6 +116,7 @@ class Map:
         num_of_poly = 0
         if state == "debug":
             num_of_poly = randint(0, 10)  # generate number of polygons in map
+            # num_of_poly = 1  # generate number of polygons in map
 
         elif state == "random":
             num_of_poly = randint(0, int(math.sqrt(self.weight / max_rad) * int(
@@ -110,19 +125,19 @@ class Map:
         polygon_list = []
 
         while num_of_poly > 0:
-            center_point = (randint(0, self.weight), randint(0, self.height))
+            center_point = randint(0, self.weight), randint(0, self.height)
             radius = randint(MIN_NO_OF_VER, max_rad)
             valid_poly_loc = True
 
             for recentPoly in polygon_list:
-                if abs(center_point[0] - recentPoly.center_point[0]) < radius + recentPoly.maxRad and abs(
-                        center_point[1] - recentPoly.center_point[1]) < radius + recentPoly.maxRad:
+                if abs(center_point[0] - recentPoly.center_point.get_coordinates()[0]) < radius + recentPoly.maxRad and abs(
+                        center_point[1] - recentPoly.center_point.get_coordinates()[1]) < radius + recentPoly.maxRad:
                     valid_poly_loc = False
                     break
 
             if valid_poly_loc:
-                polygon_list.append(Polygon(self, center_point, randint(MIN_NO_OF_VER, MAX_NO_OF_VER),
-                                            radius, state=state))  # todo: change to dinemic num_of_vertices
+                polygon_list.append(Polygon(self, Point(center_point), randint(MIN_NO_OF_VER, MAX_NO_OF_VER),
+                                            radius, state=state))  # TODO: change to dinemic num_of_vertices
                 num_of_poly -= 1
 
         return polygon_list
@@ -147,7 +162,7 @@ class Map:
                     is_generated = False
                     break
 
-        return point
+        return Point(point)
 
 
 class Polygon:
@@ -200,18 +215,17 @@ class Polygon:
             direction = randint(0, 360)
 
             # calculate the x,y coordinates of every vertex.
-            x = int(self.center_point[0] + radius * math.cos(direction))
-            y = int(self.center_point[1] + radius * math.sin(direction))
+            x = int(self.center_point.get_coordinates()[0] + radius * math.cos(direction))
+            y = int(self.center_point.get_coordinates()[1] + radius * math.sin(direction))
 
             # check if not out of bounds of the map.
             x = min(self.map.weight, max(0, x))
             y = min(self.map.height, max(0, y))
 
             # add the vertex to the verticesList.
-            vertices_list.append((x, y))
+            vertices_list.append(Point((x, y)))
 
         return vertices_list
-
 
 class ControlManager:
 
@@ -232,15 +246,15 @@ class ControlManager:
         """
         return self.map_list
 
-    def visual_maps(self, _map_list, is_polygon):
+    def visual_maps(self, _map_list, is_polygon): #TODO remove los
         """
         Visualization of each Map object from map_list one at a time using visualization method.
         """
         for m in _map_list:
-            self.visualization(m, is_polygon)
+            self.visualization(m, is_polygon) #TODO remove los
 
     @staticmethod
-    def visualization(_map, is_polygon):
+    def visualization(_map, is_polygon):#TODO remove los
         """
         Visualization of Map object.
 
@@ -249,10 +263,10 @@ class ControlManager:
         """
         fig, ax = plt.subplots()
 
-        ax.plot(_map.start_point[0], _map.start_point[1], 'o', color="magenta")  # plot start point
-        ax.annotate("Start", _map.start_point)  # print label
-        ax.plot(_map.target_point[0], _map.target_point[1], 'o', color="magenta")  # plot target point
-        ax.annotate("Target", _map.target_point)  # print label
+        ax.plot(_map.start_point.get_coordinates()[0], _map.start_point.get_coordinates()[1], 'o', color="magenta")  # plot start point
+        ax.annotate("Start", _map.start_point.get_coordinates())  # print label
+        ax.plot(_map.target_point.get_coordinates()[0], _map.target_point.get_coordinates()[1], 'o', color="magenta")  # plot target point
+        ax.annotate("Target", _map.target_point.get_coordinates())  # print label
 
         # plot polygon representation
         for poly in _map.polygons:
@@ -263,21 +277,20 @@ class ControlManager:
                 # for ver in poly.vertices:
                 #     ax.plot(ver[0], ver[1], 'o', color="blue")
 
-        ax.set_aspect(1)
-        # ratio=1.0
-        # print(abs((_map.get_weight() - 0) / (_map.get_height() - 0)) * ratio)
-        # ax.set_aspect(abs((_map.get_weight() - 0) / (_map.get_height() - 0)) * ratio)
+        ControlManager.visual_los(ax, _map.get_start_point())
 
+
+        ax.set_aspect(1)
         plt.show()
 
     @staticmethod
     def visual_polygon(ax, poly):
-        ax.plot(poly.center_point[0], poly.center_point[1], 'o', color="black")
-        circle_plot = plt.Circle(poly.center_point, poly.maxRad, fill=False, color="green")
+        ax.plot(poly.center_point.get_coordinates()[0], poly.center_point.get_coordinates()[1], 'o', color="black")
+        circle_plot = plt.Circle(poly.center_point.get_coordinates(), poly.maxRad, fill=False, color="green")
 
         ax.add_patch(circle_plot)  # print circle
         for ver in poly.vertices:
-            ax.plot(ver[0], ver[1], 'o', color="blue")
+            ax.plot(ver.get_coordinates()[0], ver.get_coordinates()[1], 'o', color="blue")
         return ax
 
     @staticmethod
@@ -286,15 +299,26 @@ class ControlManager:
         ys = []
 
         for val in poly.get_vertices():
-            xs.append(val[0])
-            ys.append(val[1])
+            xs.append(val.get_coordinates()[0])
+            ys.append(val.get_coordinates()[1])
         xs.append(xs[0])
         ys.append(ys[0])
 
         ax.plot(xs, ys, color="blue")
-        return ax
+        ax.scatter(xs, ys, color="blue")
 
-    def output_maps(self, _xml_name="mapGenerator.xml"):
+        return ax
+    @staticmethod
+    def visual_los(ax, sp):
+        los=sp.get_line_of_sight()
+        x, y= sp.get_coordinates()
+        if los is not None:
+           for v in los:
+               xs=[x, v.get_coordinates()[0]]
+               ys=[y, v.get_coordinates()[1]]
+               ax.plot(xs,ys)
+
+    def write_xml(self, _xml_name):
         """
         Create input XML file for algorithm program to read.
 
@@ -330,15 +354,15 @@ class ControlManager:
 
         start_point = SubElement(map_xml, 'StartPoint')
         xs = SubElement(start_point, 'X')
-        xs.text = str(_map.get_start_point()[0])
+        xs.text = str(_map.get_start_point().get_coordinates()[0])
         ys = SubElement(start_point, 'Y')
-        ys.text = str(_map.get_start_point()[1])
+        ys.text = str(_map.get_start_point().get_coordinates()[1])
 
         target_point = SubElement(map_xml, 'TargetPoint')
         xs = SubElement(target_point, 'X')
-        xs.text = str(_map.get_target_point()[0])
+        xs.text = str(_map.get_target_point().get_coordinates()[0])
         ys = SubElement(target_point, 'Y')
-        ys.text = str(_map.get_target_point()[1])
+        ys.text = str(_map.get_target_point().get_coordinates()[1])
 
         polygons_xml = SubElement(map_xml, 'Polygons', size=str(len(_map.get_poly())))
 
@@ -349,9 +373,9 @@ class ControlManager:
             for vertexName, vertex in enumerate(polygon.get_vertices()):
                 vertex_xml = SubElement(vertexes_xml, 'Vertex', name=str(vertexName))
                 xs = SubElement(vertex_xml, 'X')
-                xs.text = str(vertex[0])
+                xs.text = str(vertex.get_coordinates()[0])
                 ys = SubElement(vertex_xml, 'Y')
-                ys.text = str(vertex[1])
+                ys.text = str(vertex.get_coordinates()[1])
 
     @staticmethod
     def prettify(elem):
@@ -364,7 +388,7 @@ class ControlManager:
         reparse = minidom.parseString(rough_string)
         return reparse.toprettyxml(indent="  ")
 
-    def read_xml(self, _in_path="algorithmOutput.xml"):
+    def read_xml(self, _in_path):
         """
         create a new map element from given xml file path.
 
@@ -378,22 +402,29 @@ class ControlManager:
         for m in root.iter('Map'):
             weight = int(m.find("./Weight").text)
             height = int(m.find("./Height").text)
-            start_point = (int(m.find("./StartPoint/X").text), int(m.find("./StartPoint/Y").text))
-            target_point = (int(m.find("./TargetPoint/X").text), int(m.find("./TargetPoint/Y").text))
+            los=[]
+            for l in m.iter("StartPoint"):
+                for v in l.iter('Vertex'):
+                    los.append(Point((int(v.find("./X").text), int(v.find("./Y").text))))
+            start_point = Point((int(m.find("./StartPoint/X").text), int(m.find("./StartPoint/Y").text)), los)
+            target_point = Point((int(m.find("./TargetPoint/X").text), int(m.find("./TargetPoint/Y").text)))
             obstacles = []
             for o in m.iter('Obstacle'):
                 vertices = []
                 for v in o.iter('Vertex'):
-                    vertices.append((int(v.find("./X").text), int(v.find("./Y").text)))
+                    vertices.append(Point((int(v.find("./X").text), int(v.find("./Y").text))))
                 obstacle = Polygon(_num_of_vertices=len(vertices), _vertices=vertices)
                 obstacles.append(obstacle)
+
+
+
             _map = Map(weight, height, start_point, target_point, obstacles)
             map_list.append(_map)
 
         self.visual_maps(map_list, is_polygon=False)
 
     @staticmethod
-    def run_cpp(_out_path="mapGenerator.xml", _in_path=".\\algorithmOutput.xml"):
+    def exe_program(_out_path, _in_path):
         """
         function that creates the xml input file for the algorithm program, compile  the algorithm program cpp file
         and runs it with it's xml as input.
@@ -401,9 +432,10 @@ class ControlManager:
         :param _out_path: name for the xml file to be created as the input file of the algorithm program.
         :param _in_path: name for the xml file to be received from the algorithm program.
         """
-        control.output_maps(_out_path)  # create input file for the algorithm program.
+        control.write_xml(_out_path)  # create input file for the algorithm program.
         try:
             os.system("make")  # compile algorithm program c++ file.
+            # os.system("g++ -g -Wall -o findBestRouth main.cpp")  # compile algorithm program c++ file.
 
             try:
                 algo = subprocess.Popen(["./findBestRouth", _out_path, _in_path])  # run the algorithm program
@@ -412,13 +444,15 @@ class ControlManager:
                 raise Exception("Cannot run \"findBestRouth.exe\" file.")
 
         except:
-            raise Exception("Cannot compile \"findBestRouth.cpp\" file.")
+            raise Exception("Cannot compile \"main.cpp\" file.")
 
 
 if __name__ == "__main__":
+    _out_path = path.join(os.getcwd(), "mapGenerator.xml")
+    _in_path = path.join(os.getcwd(), "algorithmOutput.xml")
     control = ControlManager()  # create control object for data passing.
     control.add_map(Map(state="debug"))  # add new random Map to map_list.
-    control.add_map(Map(state="debug"))  # add new random Map to map_list.
-    control.run_cpp()  # create input file ,compile the algorithm program and runs it.
+    # control.add_map(Map(state="debug"))  # add new random Map to map_list.
+    control.exe_program(_out_path, _in_path)  # create input file ,compile the algorithm program and runs it.
     control.visual_maps(control.get_map_list(), is_polygon=True)  # visual all Maps in map_list.
-    control.read_xml()  # read xml file and plot map of it.
+    control.read_xml(_in_path)  # read xml file and plot map of it.

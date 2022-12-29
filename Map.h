@@ -1,13 +1,12 @@
-#include <vector>
 #include "Obstacle.h"
 
 class Map{ 
     private:
         const int weight;
         const int height;
-        const Point startPoint;
-        const Point targetPoint;
-        const std::vector<Obstacle> obstacles;
+        Point startPoint; // const Point startPoint; // need to be const
+        Point targetPoint; // constPoint targetPoint; // need to be const
+        std::vector<Obstacle> obstacles; // const std::vector<Obstacle> obstacles; // need to be const
 
     
     public:
@@ -16,8 +15,8 @@ class Map{
 
         int getWeight()const{return this->weight;}
         int getHeight()const{return this->height;}
-        Point getStartPoint()const{return this->startPoint;}
-        Point getTargetPoint()const{return this->targetPoint;}
-        std::vector<Obstacle> getObstacles()const{return this->obstacles;}
+        Point& getStartPoint(){return this->startPoint;} // Point& getStartPoint() const {return this->startPoint;} // need to be const
+        Point& getTargetPoint(){return this->targetPoint;} // Point& getTargetPoint() const {return this->targetPoint;} // need to be const
+        std::vector<Obstacle> &getObstacles(){return this->obstacles;} // std::vector<Obstacle> &getObstacles() const {return this->obstacles;} // need to be const
 
 };
