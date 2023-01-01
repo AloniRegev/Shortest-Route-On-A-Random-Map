@@ -10,3 +10,7 @@
     
     After Convex Hull:  
     ![After Convex Hull](Examples/cpp_output(ConvexHull).png)
+
+3. Full graph for the given map:
+
+   ![Full graph](Examples/Full_graph.png)
