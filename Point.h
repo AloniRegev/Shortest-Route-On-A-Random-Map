@@ -19,7 +19,8 @@ class Point{
          int getX()const{return this->x;}
          int getY()const{return this->y;}
 
-         std::vector<Point> getPahts() const { return this->paths; }
+         //std::vector<Point> getPahts() const { return this->paths; }
+         std::vector<Point> getPahts()  { return this->paths; }
 
          void setPaths(std::vector<Point> paths) {
              this->paths.clear();

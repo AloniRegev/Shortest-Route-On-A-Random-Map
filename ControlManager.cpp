@@ -4,7 +4,7 @@
 /*
 * output and input xml files.
 */
-void ControlManager::readXML(const char* path) {
+void ControlManager::readXML(const char* path, std::vector<Map> &maps) {
     tinyxml2::XMLDocument doc;
     doc.LoadFile(path);
     tinyxml2::XMLElement* pRootElement = doc.RootElement();
@@ -18,7 +18,7 @@ void ControlManager::readXML(const char* path) {
             Point startPoint = Point(atoi(pMap->FirstChildElement("StartPoint")->FirstChildElement("X")->GetText()), atoi(pMap->FirstChildElement("StartPoint")->FirstChildElement("Y")->GetText()));
             Point targetPoint = Point(atoi(pMap->FirstChildElement("TargetPoint")->FirstChildElement("X")->GetText()), atoi(pMap->FirstChildElement("TargetPoint")->FirstChildElement("Y")->GetText()));
 
-            std::vector<Obstacle> obstacles;
+            std::vector<Obstacle> obstacles; //TODO remove
 
             tinyxml2::XMLElement* pPolygon = pMap->FirstChildElement("Polygons")->FirstChildElement("Polygon"); // pointer to the first polygon object data.
             while (pPolygon != NULL) {
@@ -33,7 +33,7 @@ void ControlManager::readXML(const char* path) {
                     pVertex = pVertex->NextSiblingElement("Vertex"); // move pointer to the next vertex data.
                 }
                 Polygon polygon(vertexes.size(), vertexes); // create new polygon object.
-                Obstacle obstacle(polygon, ConvexHull(vertexes)); // add new obstacle to obstacles List.
+                Obstacle obstacle(polygon, ConvexHull(vertexes)); // add new obstacle to obstacles List. TODO remove
                 obstacles.push_back(obstacle);
 
                 pPolygon = pPolygon->NextSiblingElement("Polygon"); // move pointer to the next polygon object data.
@@ -46,7 +46,7 @@ void ControlManager::readXML(const char* path) {
     }
 }
 
-void addPointToXML(tinyxml2::XMLDocument& doc, tinyxml2::XMLElement* &root, Point &point) {
+void addPointToXML(tinyxml2::XMLDocument& doc, tinyxml2::XMLElement* &root, Point point) {
     tinyxml2::XMLElement* pX = doc.NewElement("X");
     pX->SetText(point.getX());
     root->InsertEndChild(pX);
@@ -71,7 +71,7 @@ void addLosToXML(tinyxml2::XMLDocument& doc, tinyxml2::XMLElement*& root, std::v
 }
 
 
-void ControlManager::writeXML(const char* path) {
+void ControlManager::writeXML(const char* path, std::vector<Map>& maps) {
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLElement* pRoot = doc.NewElement("Root");
     doc.InsertFirstChild(pRoot);
@@ -256,6 +256,14 @@ std::vector<Point> ControlManager::ConvexHull(std::vector<Point> points) {
     return hull;
 }
 
+//void ControlManager::ConvexHullMaps(std::vector<Map> &maps) {
+//    for (Map& map : maps) {
+//        for (Obstacle& obstacle : map.getObstacles()) {
+//
+//        }
+//    }
+//}
+
 /*
 * line of sight
 */
@@ -324,6 +332,8 @@ std::vector<Point> ControlManager::lineOfSight(Map &map, Point &startPoint) {
         los.push_back(map.getTargetPoint());
 
     for (Obstacle& obOut: map.getObstacles()) {
+        if (std::find(obOut.getConvexVertexes().begin(), obOut.getConvexVertexes().end(), startPoint) != obOut.getConvexVertexes().end()) // TODO not sure if necesery
+            continue;
         for (Point& ver : obOut.getConvexVertexes()) {
             if (isLos(map, startPoint, ver))
                 los.push_back(ver);
@@ -334,4 +344,10 @@ std::vector<Point> ControlManager::lineOfSight(Map &map, Point &startPoint) {
 
 void ControlManager::creatGraph(Map& map) {
     map.getStartPoint().setPaths(lineOfSight(map, map.getStartPoint()));
+
+    for (Obstacle &obstacle : map.getObstacles()) {
+        for (Point &point : obstacle.getConvexVertexes()) {
+            point.setPaths(lineOfSight(map, point));
+        }
+    }
 }
