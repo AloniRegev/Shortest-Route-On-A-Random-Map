@@ -276,10 +276,10 @@ class ControlManager:
             if is_polygon:
                 ax = ControlManager.visual_polygon(ax, poly)
             else:
-                ax = ControlManager.visual_obstacle(ax, poly)
                 ControlManager.visual_los(ax, _map.get_start_point())
                 for ver in poly.get_vertices():
                     ControlManager.visual_los(ax, ver)
+                ControlManager.visual_obstacle(ax, poly)
 
 
         ax.set_aspect(1)

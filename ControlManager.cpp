@@ -332,8 +332,25 @@ std::vector<Point> ControlManager::lineOfSight(Map &map, Point &startPoint) {
         los.push_back(map.getTargetPoint());
 
     for (Obstacle& obOut: map.getObstacles()) {
-        if (std::find(obOut.getConvexVertexes().begin(), obOut.getConvexVertexes().end(), startPoint) != obOut.getConvexVertexes().end()) // TODO not sure if necesery
+        
+        auto it = std::find(obOut.getConvexVertexes().begin(), obOut.getConvexVertexes().end(), startPoint);
+        if (it != obOut.getConvexVertexes().end()) { // TODO not sure if necesery
+            int index = it - obOut.getConvexVertexes().begin();
+            int before = index - 1;
+            int after = index + 1;
+            if (index == 0) 
+                before=obOut.getConvexVertexes().size() - 1;
+            
+            if (index == (int)obOut.getConvexVertexes().size() - 1)
+                 after=0;
+            
+                los.push_back(obOut.getConvexVertexes()[before]);
+                los.push_back(obOut.getConvexVertexes()[after]);
+            
+
             continue;
+        }
+
         for (Point& ver : obOut.getConvexVertexes()) {
             if (isLos(map, startPoint, ver))
                 los.push_back(ver);
