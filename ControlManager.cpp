@@ -305,18 +305,13 @@ std::vector<Point> ControlManager::ConvexHull(std::vector<Point> points) {
 //}
 
 bool isLos(Map &map,Point & startPoint, Point &ver)   {
-    int firstInd = 0;
-    int secondInd = 0;
+    int nextInd = 0;
     for (Obstacle& obIn : map.getObstacles()) {
         for (int i = 0; i < (int)obIn.getConvexVertexes().size(); i++) {
-            firstInd = i;
-            secondInd = i + 1;
-            if (i == (int)obIn.getConvexVertexes().size() - 1) {
-                secondInd = 0;
-            }
+            nextInd = i < (int)obIn.getConvexVertexes().size() - 1 ? i + 1 : 0 ;
 
-            Point firstP = obIn.getConvexVertexes()[firstInd];
-            Point secondP = obIn.getConvexVertexes()[secondInd];
+            Point firstP = obIn.getConvexVertexes()[i];
+            Point secondP = obIn.getConvexVertexes()[nextInd];
             if (!(startPoint == firstP) && !(startPoint == secondP) && !(ver == firstP) && !(ver == secondP) && doIntersect(startPoint, ver, firstP, secondP)) 
                 return false;
         }
@@ -333,25 +328,20 @@ std::vector<Point> ControlManager::lineOfSight(Map &map, Point &startPoint) {
 
     for (Obstacle& obOut: map.getObstacles()) {
         
-        auto it = std::find(obOut.getConvexVertexes().begin(), obOut.getConvexVertexes().end(), startPoint);
-        if (it != obOut.getConvexVertexes().end()) { // TODO not sure if necesery
-            int index = it - obOut.getConvexVertexes().begin();
-            int before = index - 1;
-            int after = index + 1;
-            if (index == 0) 
-                before=obOut.getConvexVertexes().size() - 1;
+        std::vector<Point>& convexVertexes = obOut.getConvexVertexes();
+        auto it = std::find(convexVertexes.begin(), convexVertexes.end(), startPoint);
+        if (it != convexVertexes.end()) { 
+            int index = it - convexVertexes.begin();
+            int before = index > 0 ? index-1 : convexVertexes.size() - 1;
+            int after = index < (int)convexVertexes.size() - 1 ? index + 1 : 0;
             
-            if (index == (int)obOut.getConvexVertexes().size() - 1)
-                 after=0;
+            los.push_back(convexVertexes[before]);
+            los.push_back(convexVertexes[after]);
             
-                los.push_back(obOut.getConvexVertexes()[before]);
-                los.push_back(obOut.getConvexVertexes()[after]);
-            
-
             continue;
         }
 
-        for (Point& ver : obOut.getConvexVertexes()) {
+        for (Point& ver : convexVertexes) {
             if (isLos(map, startPoint, ver))
                 los.push_back(ver);
         }
