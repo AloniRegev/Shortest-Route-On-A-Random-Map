@@ -8,6 +8,7 @@ class Map{
         //Point targetPoint; 
         const Point targetPoint; // need to be const
         std::vector<Obstacle> obstacles; // const std::vector<Obstacle> obstacles; // need to be const
+        std::vector<Point> route;
 
     
     public:
@@ -20,5 +21,12 @@ class Map{
         //Point& getTargetPoint(){return this->targetPoint;} 
         Point getTargetPoint() const {return this->targetPoint;} // need to be const
         std::vector<Obstacle> &getObstacles(){return this->obstacles;} // std::vector<Obstacle> &getObstacles() const {return this->obstacles;} // need to be const
-
+        std::vector<Point> getRoute()const { return this->route; }
+        void setRoute(std::vector<Point> route) {  
+            this->route.clear();
+            for (Point point : route) {
+                Point ver(point.getX(), point.getY()); // TODO remove
+                this->route.push_back(ver);
+            }
+        }
 };

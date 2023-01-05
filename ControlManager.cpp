@@ -97,13 +97,13 @@ void ControlManager::writeXML(const char* path, std::vector<Map>& maps) {
         //insert start point
         tinyxml2::XMLElement* pStartPoint = doc.NewElement("StartPoint");
         addPointToXML(doc, pStartPoint, map.getStartPoint());
-        addLosToXML(doc, pStartPoint, map.getStartPoint().getPahts());      
+        addLosToXML(doc, pStartPoint, lineOfSight(map, map.getStartPoint()));
         pMap->InsertEndChild(pStartPoint);
 
         //insert target point
         tinyxml2::XMLElement* pTargetPoint = doc.NewElement("TargetPoint");
         addPointToXML(doc, pTargetPoint, map.getTargetPoint());
-        addLosToXML(doc, pTargetPoint, map.getTargetPoint().getPahts());
+        //addLosToXML(doc, pTargetPoint, lineOfSight(map, map.getTargetPoint()));
         pMap->InsertEndChild(pTargetPoint);
 
         //insert obstacles;
@@ -123,7 +123,7 @@ void ControlManager::writeXML(const char* path, std::vector<Map>& maps) {
                 pVertex->SetAttribute("name", nameConvex++);
 
                 addPointToXML(doc, pVertex, convex);
-                addLosToXML(doc, pVertex, convex.getPahts());
+                addLosToXML(doc, pVertex, lineOfSight(map, convex));
 
                 pVertexes->InsertEndChild(pVertex);
             }
@@ -131,7 +131,22 @@ void ControlManager::writeXML(const char* path, std::vector<Map>& maps) {
             pObstacles->InsertEndChild(pObstacle);
         }
         pMap->InsertEndChild(pObstacles);
+        
+        //insert Route;
+        tinyxml2::XMLElement* pRoute = doc.NewElement("Route");
+        pRoute->SetAttribute("size", (int)map.getRoute().size());
+        int nameRoute = 0;
+        for (Point &routeVer : map.getRoute()) {
+            tinyxml2::XMLElement* pNode = doc.NewElement("Vertex");
+            pNode->SetAttribute("name", nameRoute++);
 
+            addPointToXML(doc, pNode, routeVer);
+
+            pRoute->InsertEndChild(pNode);
+        }
+        pMap->InsertEndChild(pRoute);
+
+        //insert Map;
         pMaps->InsertEndChild(pMap);
     }
     pRoot->InsertEndChild(pMaps);
@@ -152,7 +167,7 @@ int orientation(Point p, Point q, Point r)
     return (val > 0) ? 1 : 2; // clock or counterclockwise wise
 }
 
-float distance(Point p1, Point p2)
+float euclideanDistance(Point p1, Point p2)
 {
     // Calculating distance
     return sqrt(pow(p2.getX() - p1.getX(), 2) + pow(p2.getY() - p1.getY(), 2) * 1.0);
@@ -234,7 +249,7 @@ std::vector<Point> ControlManager::ConvexHull(std::vector<Point> points) {
         for (int i = 0; i < n; i++)
         {
             // If i is more counterclockwise than current q, then update q
-            if (orientation(points[p], points[i], points[q]) == 2 && abs(distance(points[p], points[i]) - abs(distance(points[p], points[q]) + distance(points[q], points[i]))) > epsilon) { //todo fix
+            if (orientation(points[p], points[i], points[q]) == 2 && abs(euclideanDistance(points[p], points[i]) - abs(euclideanDistance(points[p], points[q]) + euclideanDistance(points[q], points[i]))) > epsilon) { //todo fix
                 q = i;
             }
 
@@ -304,40 +319,40 @@ std::vector<Point> ControlManager::ConvexHull(std::vector<Point> points) {
 //    return los;
 //}
 
-bool isLos(Map &map,Point & startPoint, Point &ver)   {
+bool isLos(Map& map, Point& startPoint, Point& ver) {
     int nextInd = 0;
     for (Obstacle& obIn : map.getObstacles()) {
         for (int i = 0; i < (int)obIn.getConvexVertexes().size(); i++) {
-            nextInd = i < (int)obIn.getConvexVertexes().size() - 1 ? i + 1 : 0 ;
+            nextInd = i < (int)obIn.getConvexVertexes().size() - 1 ? i + 1 : 0;
 
             Point firstP = obIn.getConvexVertexes()[i];
             Point secondP = obIn.getConvexVertexes()[nextInd];
-            if (!(startPoint == firstP) && !(startPoint == secondP) && !(ver == firstP) && !(ver == secondP) && doIntersect(startPoint, ver, firstP, secondP)) 
+            if (!(startPoint == firstP) && !(startPoint == secondP) && !(ver == firstP) && !(ver == secondP) && doIntersect(startPoint, ver, firstP, secondP))
                 return false;
         }
     }
     return true;
 }
 
-std::vector<Point> ControlManager::lineOfSight(Map &map, Point &startPoint) {
+std::vector<Point> ControlManager::lineOfSight(Map& map, Point& startPoint) {
 
     std::vector<Point> los;
     Point target = map.getTargetPoint();
     if (isLos(map, startPoint, target))
         los.push_back(map.getTargetPoint());
 
-    for (Obstacle& obOut: map.getObstacles()) {
-        
+    for (Obstacle& obOut : map.getObstacles()) {
+
         std::vector<Point>& convexVertexes = obOut.getConvexVertexes();
         auto it = std::find(convexVertexes.begin(), convexVertexes.end(), startPoint);
-        if (it != convexVertexes.end()) { 
+        if (it != convexVertexes.end()) {
             int index = it - convexVertexes.begin();
-            int before = index > 0 ? index-1 : convexVertexes.size() - 1;
+            int before = index > 0 ? index - 1 : convexVertexes.size() - 1;
             int after = index < (int)convexVertexes.size() - 1 ? index + 1 : 0;
-            
+
             los.push_back(convexVertexes[before]);
             los.push_back(convexVertexes[after]);
-            
+
             continue;
         }
 
@@ -349,12 +364,71 @@ std::vector<Point> ControlManager::lineOfSight(Map &map, Point &startPoint) {
     return los;
 }
 
-void ControlManager::creatGraph(Map& map) {
-    map.getStartPoint().setPaths(lineOfSight(map, map.getStartPoint()));
+//void ControlManager::creatGraph(Map& map) {
+//    map.getStartPoint().setPaths(lineOfSight(map, map.getStartPoint()));
+//
+//    for (Obstacle &obstacle : map.getObstacles()) {
+//        for (Point &point : obstacle.getConvexVertexes()) {
+//            point.setPaths(lineOfSight(map, point));
+//        }
+//    }
+//}
 
-    for (Obstacle &obstacle : map.getObstacles()) {
-        for (Point &point : obstacle.getConvexVertexes()) {
-            point.setPaths(lineOfSight(map, point));
+/*find the best routh from start point to target point*/
+
+std::vector<Point> reconstruct_path(Point *input, std::unordered_map<std::string, Point> & cameFrom) {
+    Point* current = input;
+    std::vector<Point> total_path = { *current };
+        while (cameFrom.find(current->toString())!= cameFrom.end()) {
+            current = &cameFrom[current->toString()];
+            total_path.push_back(*current);
+        }
+        return total_path;
+}
+
+
+std::vector<Point> ControlManager::aStar(Point& start, Point target, Map& map) {
+
+
+    std::priority_queue<std::pair<double, Point>, std::vector<std::pair<double, Point>>, CompareF> openSet;
+
+    std::unordered_map<std::string, double> gScore;
+    std::unordered_map<std::string, double> fScore;
+    std::unordered_map<std::string, Point> cameFrom;
+    
+    gScore[start.toString()] = 0;
+    fScore[start.toString()] = euclideanDistance(start, target);
+
+    openSet.push(std::make_pair(fScore[start.toString()], start));
+
+    
+    while (!openSet.empty()) {
+        Point current = openSet.top().second;
+
+        if (current == target)
+            return reconstruct_path(&current, cameFrom);
+
+        openSet.pop();
+        for (Point& neighbor : lineOfSight(map, current)) {
+
+            if (gScore.find(neighbor.toString()) == gScore.end()) {
+                gScore[neighbor.toString()] = INFINITY;
+            }
+            double tentative_gScore = gScore[current.toString()] + euclideanDistance(current, neighbor);
+
+            if (tentative_gScore < gScore[neighbor.toString()]) {
+                cameFrom[neighbor.toString()] = current;
+                gScore[neighbor.toString()] = tentative_gScore;
+                fScore[neighbor.toString()] = tentative_gScore + euclideanDistance(neighbor, target);
+
+                std::pair<double, Point> neighborPair = std::make_pair(fScore[neighbor.toString()], neighbor);
+                //if (openSet.find(neighborPair) != openSet.end()) {
+                    openSet.push(neighborPair); 
+                //}
+            }
         }
     }
+
+    std::vector<Point> result;
+    return result;
 }
