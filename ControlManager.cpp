@@ -376,6 +376,15 @@ std::vector<Point> ControlManager::lineOfSight(Map& map, Point& startPoint) {
 
 /*find the best routh from start point to target point*/
 
+struct CompareF {
+    int operator()(std::pair<double, Point> const& p1, std::pair<double, Point> const& p2)
+    {
+        // return "true" if "p1" is ordered
+        // before "p2", for example:
+        return p1.first > p2.first;
+    }
+};
+
 std::vector<Point> reconstruct_path(Point *input, std::unordered_map<std::string, Point> & cameFrom) {
     Point* current = input;
     std::vector<Point> total_path = { *current };
@@ -386,10 +395,7 @@ std::vector<Point> reconstruct_path(Point *input, std::unordered_map<std::string
         return total_path;
 }
 
-
 std::vector<Point> ControlManager::aStar(Point& start, Point target, Map& map) {
-
-
     std::priority_queue<std::pair<double, Point>, std::vector<std::pair<double, Point>>, CompareF> openSet;
 
     std::unordered_map<std::string, double> gScore;

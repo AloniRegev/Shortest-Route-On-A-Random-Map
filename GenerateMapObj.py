@@ -124,8 +124,8 @@ class Map:
         """
         num_of_poly = 0
         if state == "debug":
-            # num_of_poly = randint(0, 10)  # generate number of polygons in map
-            num_of_poly = 5  # generate number of polygons in map
+            num_of_poly = randint(0, 10)  # generate number of polygons in map
+            # num_of_poly = 5  # generate number of polygons in map
 
         elif state == "random":
             num_of_poly = randint(0, int(math.sqrt(self.weight / max_rad) * int(
@@ -188,8 +188,8 @@ class Polygon:
         self.center_point = Point(_center_point)
         self.num_of_vertices = _num_of_vertices
         if state == "debug":
-            # self.maxRad = 10
-            self.maxRad = 20
+            self.maxRad = 10
+            # self.maxRad = 20
         else:
             self.maxRad = _max_rad
 
@@ -458,7 +458,7 @@ class ControlManager:
         return map_list
 
     @staticmethod
-    def exe_program(_out_path: object, _in_path: object) -> object:
+    def exe_program(_out_path: object, _in_path: object):
         """
         function that creates the xml input file for the algorithm program, compile  the algorithm program cpp file
         and runs it with it's xml as input.
@@ -468,11 +468,11 @@ class ControlManager:
         """
         control.write_xml(_out_path)  # create input file for the algorithm program.
         try:
-            os.system("make")  # compile algorithm program c++ file.
-            # os.system("g++ -g -Wall -o findBestRouth main.cpp")  # compile algorithm program c++ file.
+            if not os.path.exists(path.join(os.getcwd(), "findBestRouth.exe")):
+                os.system("make")  # compile algorithm program c++ file.
 
             try:
-                algo = subprocess.Popen(["./findBestRouth", _out_path, _in_path])  # run the algorithm program
+                algo = subprocess.Popen([path.join(os.getcwd(), "findBestRouth.exe"), _out_path, _in_path])  # run the algorithm program
                 algo.wait()
 
             except:

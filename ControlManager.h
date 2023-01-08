@@ -35,11 +35,4 @@ public:
 
 };
 
-struct CompareF {
-    int operator()(std::pair<double, Point> const& p1, std::pair<double, Point> const& p2)
-    {
-        // return "true" if "p1" is ordered
-        // before "p2", for example:
-        return p1.first > p2.first;
-    }
-};
+
