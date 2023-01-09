@@ -3,11 +3,11 @@
 #include <iostream>
 
 int main(int argc,const char *argv[]){
-    // const char * inPath = argv[1];      // input name file
-    // const char * outPath = argv[2];     // output name file
+     const char * inPath = argv[1];      // input name file
+     const char * outPath = argv[2];     // output name file
     
-    const char * inPath = "C:/Code/GitHub/Shortest-Route-On-A-Random-Map/mapGenerator.xml";      // input name file
-    const char * outPath = "C:/Code/GitHub/Shortest-Route-On-A-Random-Map/algorithmOutput.xml";     // output name file
+    //const char * inPath = "C:/Code/GitHub/Shortest-Route-On-A-Random-Map/mapGenerator.xml";      // input name file
+    //const char * outPath = "C:/Code/GitHub/Shortest-Route-On-A-Random-Map/algorithmOutput.xml";     // output name file
 
     std::vector<Map> maps;
     ControlManager control;             // initialize new control object.

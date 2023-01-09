@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 
 from win32api import GetSystemMetrics
 
-
 MIN_NO_OF_VER = 3
 MAX_NO_OF_VER = 10
 
@@ -47,9 +46,10 @@ class Map:
             and target_point to (max_weight, max_height) (top right corner).
         It set to "random" by default.
         """
+        self.routh = None
         if _weight is None:
             if state == "random":
-                self.weight = randint(0, GetSystemMetrics(0))
+                self.weight = randint(100, GetSystemMetrics(0))
             elif state == "debug":
                 self.weight = 100
         else:
@@ -57,7 +57,7 @@ class Map:
 
         if _height is None:
             if state == "random":
-                self.height = randint(0, GetSystemMetrics(1))
+                self.height = randint(100, GetSystemMetrics(1))
             elif state == "debug":
                 self.height = 100
         else:
@@ -115,7 +115,7 @@ class Map:
     def set_poly(self, polygons):
         self.polygons = polygons
 
-    def generate_polygons(self, state="random", max_rad=100):
+    def generate_polygons(self, state="random", max_rad=300):
         """
         Class function that generate polygon objects of the Map object.
         It runs on the creation of a new Map object.
@@ -126,8 +126,8 @@ class Map:
         """
         num_of_poly = 0
         if state == "debug":
-            num_of_poly = randint(0, 10)  # generate number of polygons in map
-            # num_of_poly = 5  # generate number of polygons in map
+            num_of_poly = randint(0, 40)  # generate number of polygons in map
+            # num_of_poly = 40  # generate number of polygons in map
 
         elif state == "random":
             num_of_poly = randint(0, int(math.sqrt(self.weight / max_rad) * int(
@@ -149,8 +149,9 @@ class Map:
                     break
 
             if valid_poly_loc:
-                polygon_list.append(Polygon((self.weight, self.height),center_point, randint(MIN_NO_OF_VER, MAX_NO_OF_VER),
-                                            radius, state=state))  # TODO: change to dinemic num_of_vertices
+                polygon_list.append(
+                    Polygon((self.weight, self.height), center_point, randint(MIN_NO_OF_VER, MAX_NO_OF_VER),
+                            radius, state=state))  # TODO: change to dinemic num_of_vertices
             if valid_poly_loc or timer % 100 == 0:
                 num_of_poly -= 1
 
@@ -182,7 +183,7 @@ class Map:
 
 class Polygon:
 
-    def __init__(self, _dim=None,  _center_point=None, _num_of_vertices=0, _max_rad=None, _vertices=None,
+    def __init__(self, _dim=None, _center_point=None, _num_of_vertices=0, _max_rad=None, _vertices=None,
                  state="random"):
         if _vertices is None:
             _vertices = []
@@ -190,13 +191,11 @@ class Polygon:
         self.center_point = Point(_center_point)
         self.num_of_vertices = _num_of_vertices
         if state == "debug":
-            self.maxRad = 10
-            # self.maxRad = 20
+            self.maxRad = 15
         else:
             self.maxRad = _max_rad
 
         self.vertices = self.generate_vertices() if not _vertices else _vertices
-
 
     def get_center(self):
         return self.center_point
@@ -289,7 +288,6 @@ class ControlManager:
             else:
                 ControlManager.visual_polygon(ax, poly)
 
-        if is_from_input:
             ControlManager.visual_routh(ax, _map.get_routh())
 
         ax.plot(_map.start_point.get_coordinates()[0], _map.start_point.get_coordinates()[1], 'o',
@@ -417,7 +415,8 @@ class ControlManager:
         reparse = minidom.parseString(rough_string)
         return reparse.toprettyxml(indent="  ")
 
-    def read_xml(self, _in_path):
+    @staticmethod
+    def read_xml(_in_path):
         """
         create a new map element from given xml file path.
 
@@ -431,27 +430,27 @@ class ControlManager:
         for m in root.iter('Map'):
             weight = int(m.find("./Weight").text)
             height = int(m.find("./Height").text)
-            splos = []
-            for l in m.iter("StartPoint"):
-                for v in l.iter('Vertex'):
-                    splos.append(Point((int(v.find("./X").text), int(v.find("./Y").text))))
-            start_point = Point((int(m.find("./StartPoint/X").text), int(m.find("./StartPoint/Y").text)), splos)
+            sp_los = []
+            for sp in m.iter("StartPoint"):
+                for v in sp.iter('Vertex'):
+                    sp_los.append(Point((int(v.find("./X").text), int(v.find("./Y").text))))
+            start_point = Point((int(m.find("./StartPoint/X").text), int(m.find("./StartPoint/Y").text)), sp_los)
             target_point = Point((int(m.find("./TargetPoint/X").text), int(m.find("./TargetPoint/Y").text)))
             obstacles = []
             for o in m.iter('Obstacle'):
                 vertices = []
                 for v in o.findall('.Vertexes/Vertex'):
                     ver = (int(v.find("./X").text), int(v.find("./Y").text))
-                    plos = []
-                    for vlos in v.iter("Vertex"):
-                        plos.append(Point((int(vlos.find("./X").text), int(vlos.find("./Y").text))))
-                    vertices.append(Point(ver, plos))
+                    p_los = []
+                    for v_los in v.iter("Vertex"):
+                        p_los.append(Point((int(v_los.find("./X").text), int(v_los.find("./Y").text))))
+                    vertices.append(Point(ver, p_los))
 
                 obstacle = Polygon(_num_of_vertices=len(vertices), _vertices=vertices)
                 obstacles.append(obstacle)
 
+            route = []
             for r in m.iter('Route'):
-                route = []
                 for route_ver in r.iter('Vertex'):
                     route.append(Point((int(route_ver.find("./X").text), int(route_ver.find("./Y").text))))
 
@@ -475,7 +474,8 @@ class ControlManager:
                 os.system("make")  # compile algorithm program c++ file.
 
             try:
-                algo = subprocess.Popen([path.join(os.getcwd(), "findBestRouth.exe"), _out_path, _in_path])  # run the algorithm program
+                algo = subprocess.Popen(
+                    [path.join(os.getcwd(), "findBestRouth.exe"), _out_path, _in_path])  # run the algorithm program
                 algo.wait()
 
             except:
@@ -486,12 +486,16 @@ class ControlManager:
 
 
 if __name__ == "__main__":
-    _out_path = path.join(os.getcwd(), "mapGenerator.xml")
-    _in_path = path.join(os.getcwd(), "algorithmOutput.xml")
+    _out_path = path.join(os.getcwd(), "Python_output.xml")
+    _in_path = path.join(os.getcwd(), "cpp_output.xml")
     control = ControlManager()  # create control object for data passing.
-    control.add_map(Map(state="debug", _polygons=[Polygon(_dim=(100,100),_center_point=(25,35), _num_of_vertices=20, _max_rad=25), Polygon(_dim=(100,100),_center_point=(75,65), _num_of_vertices=20, _max_rad=25)]))  # add new random Map to map_list.
+    # control.add_map(Map(state="debug", _polygons=[Polygon(_dim=(100,100),_center_point=(25,35), _num_of_vertices=3, _max_rad=25)]))  # add new random Map to map_list.
+    control.add_map(Map(state="debug",
+                        _polygons=[Polygon(_dim=(100, 100), _center_point=(25, 35), _num_of_vertices=20, _max_rad=25),
+                                   Polygon(_dim=(100, 100), _center_point=(75, 65), _num_of_vertices=20,
+                                           _max_rad=25)]))  # add new random Map to map_list.
     # control.add_map(Map(state="debug"))  # add new random Map to map_list.
-    # control.add_map(Map(state="random"))  # add new random Map to map_list.
+    control.add_map(Map(state="random"))  # add new random Map to map_list.
     control.exe_program(_out_path, _in_path)  # create input file ,compile the algorithm program and runs it.
     control.visual_maps(control.get_map_list(), is_polygon=False)  # visual all Maps in map_list.
     received_map_list = control.read_xml(_in_path)  # read xml file and plot map of it.
