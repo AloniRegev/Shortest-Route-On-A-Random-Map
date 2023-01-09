@@ -8,7 +8,9 @@ from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, SubElement
 
 import matplotlib.pyplot as plt
+
 from win32api import GetSystemMetrics
+
 
 MIN_NO_OF_VER = 3
 MAX_NO_OF_VER = 10
@@ -321,7 +323,8 @@ class ControlManager:
             xs.append(xs[0])
             ys.append(ys[0])
 
-        ax.plot(xs, ys, color="black")
+        ax.plot(xs, ys, color="blue", alpha=.5)
+        ax.fill_between(xs, ys, 0, facecolor='blue', alpha=.5)
         ax.scatter(xs, ys, color="blue")
 
     @staticmethod
@@ -487,8 +490,8 @@ if __name__ == "__main__":
     _in_path = path.join(os.getcwd(), "algorithmOutput.xml")
     control = ControlManager()  # create control object for data passing.
     control.add_map(Map(state="debug", _polygons=[Polygon(_dim=(100,100),_center_point=(25,35), _num_of_vertices=20, _max_rad=25), Polygon(_dim=(100,100),_center_point=(75,65), _num_of_vertices=20, _max_rad=25)]))  # add new random Map to map_list.
-    control.add_map(Map(state="debug"))  # add new random Map to map_list.
-    control.add_map(Map(state="random"))  # add new random Map to map_list.
+    # control.add_map(Map(state="debug"))  # add new random Map to map_list.
+    # control.add_map(Map(state="random"))  # add new random Map to map_list.
     control.exe_program(_out_path, _in_path)  # create input file ,compile the algorithm program and runs it.
     control.visual_maps(control.get_map_list(), is_polygon=False)  # visual all Maps in map_list.
     received_map_list = control.read_xml(_in_path)  # read xml file and plot map of it.
