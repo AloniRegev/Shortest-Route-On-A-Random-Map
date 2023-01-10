@@ -16,12 +16,19 @@ MAX_NO_OF_VER = 10
 
 
 class Point:
+    """
+    class that represent Point object.
+    """
+
     def __init__(self, coordinates, line_of_sight=None):
+        """
+
+        :param
+        coordinates: x and y coordinate values of the point.
+        line_of_sight: A list of all the points that can be seen from the current point.
+        """
         self.coordinates = coordinates
-        if line_of_sight:
-            self.line_of_sight = line_of_sight
-        else:
-            self.line_of_sight = []
+        self.line_of_sight = line_of_sight if line_of_sight else []
 
     def get_coordinates(self):
         return self.coordinates
@@ -34,11 +41,22 @@ class Point:
 
 
 class Map:
-    def __init__(self, _weight=None, _height=None, _start_point=None, _target_point=None, _polygons=None, _route=None,
+    """
+    class that represent a Map object.
+    """
+
+    def __init__(self, _width=None, _height=None, _start_point=None, _target_point=None, _polygons=None, _route=None,
                  state="random"):
         """
 
-        :param state: set the start_point and target_point randomly or fixed.
+        :param
+        _width: Map width value.
+        _height: Map height value.
+        _start_point: Start_point value.
+        _target_point: Target_point value.
+        _polygons: A list of all the polygons on the map. If no list is defined it will automatically draw polygons.
+        _route: A list of the points describing the easiest route.
+        state: set the start_point and target_point randomly or fixed.
 
         If set to "random" then it wil generate random points.
         If set to "debug" then it fix the
@@ -47,13 +65,13 @@ class Map:
         It set to "random" by default.
         """
         self.routh = None
-        if _weight is None:
+        if _width is None:
             if state == "random":
-                self.weight = randint(100, GetSystemMetrics(0))
+                self.width = randint(100, GetSystemMetrics(0))
             elif state == "debug":
-                self.weight = 100
+                self.width = 100
         else:
-            self.weight = _weight
+            self.width = _width
 
         if _height is None:
             if state == "random":
@@ -72,13 +90,14 @@ class Map:
 
             elif state == "debug":
                 self.start_point = Point((0, 0))
-                self.target_point = Point((self.weight, self.height))
+                self.target_point = Point((self.width, self.height))
         else:
             self.start_point = _start_point
             self.target_point = _target_point
 
         self.route = _route if _route else []
 
+    # getters and setters.
     def get_height(self):
         return self.height
 
@@ -86,16 +105,10 @@ class Map:
         self.height = height
 
     def get_weight(self):
-        return self.weight
-
-    # def setWeight(self, weightMap):
-    #     self.weight=weightMap
+        return self.width
 
     def get_start_point(self):
         return self.start_point
-
-    # def set_start_point(self, start_point):
-    #     self.start_point=start_point
 
     def get_target_point(self):
         return self.target_point
@@ -115,12 +128,13 @@ class Map:
     def set_poly(self, polygons):
         self.polygons = polygons
 
+    # class functions.
     def generate_polygons(self, state="random", max_rad=300):
         """
         Class function that generate polygon objects of the Map object.
         It runs on the creation of a new Map object.
 
-        :param state: 
+        :param state: set the start_point and target_point randomly or fixed.
         :param max_rad: maximum radius length from polygon center point to its vertexes.
         :return: list of polygon of the self Map object.
         """
@@ -130,14 +144,14 @@ class Map:
             # num_of_poly = 40  # generate number of polygons in map
 
         elif state == "random":
-            num_of_poly = randint(0, int(math.sqrt(self.weight / max_rad) * int(
+            num_of_poly = randint(0, int(math.sqrt(self.width / max_rad) * int(
                 self.height / max_rad)))  # generate number of polygons in map
 
         polygon_list = []
 
         timer = 0
         while num_of_poly > 0:
-            center_point = randint(0, self.weight), randint(0, self.height)
+            center_point = randint(0, self.width), randint(0, self.height)
             radius = randint(MIN_NO_OF_VER, max_rad)
             valid_poly_loc = True
 
@@ -150,8 +164,8 @@ class Map:
 
             if valid_poly_loc:
                 polygon_list.append(
-                    Polygon((self.weight, self.height), center_point, randint(MIN_NO_OF_VER, MAX_NO_OF_VER),
-                            radius, state=state))  # TODO: change to dinemic num_of_vertices
+                    Polygon((self.width, self.height), center_point, randint(MIN_NO_OF_VER, MAX_NO_OF_VER),
+                            radius, state=state))
             if valid_poly_loc or timer % 100 == 0:
                 num_of_poly -= 1
 
@@ -169,7 +183,7 @@ class Map:
         point = (0, 0)
         is_generated = False
         while not is_generated:
-            point = (randint(0, self.weight), randint(0, self.height))
+            point = (randint(0, self.width), randint(0, self.height))
             is_generated = True
             for recentPoly in self.polygons:
                 x, y = recentPoly.center_point.get_coordinates()
@@ -182,12 +196,32 @@ class Map:
 
 
 class Polygon:
+    """
+    class that represent polygon object.
+    """
 
-    def __init__(self, _dim=None, _center_point=None, _num_of_vertices=0, _max_rad=None, _vertices=None,
+    def __init__(self, _dimension=None, _center_point=None, _num_of_vertices=0, _max_rad=None, _vertices=None,
                  state="random"):
+        """
+
+        :param
+        _dimension: A tuple describing the map dimensions (width, height) of the map the polygon is related to.
+        _center_point: The center point of the polygon.
+        _num_of_vertices: The number of vertices in the polygon.
+        _max_rad: The size of the maximum radius that the polygon can draw.
+        _vertices: A list of vertices in a polygon. If no list is passed,
+                    it will automatically draw vertices into a polygon.
+        state: set the start_point and target_point randomly or fixed.
+
+        If set to "random" then it wil generate random points.
+        If set to "debug" then it fix the
+            start_point to (0, 0) (bottom left corner)
+            and target_point to (max_weight, max_height) (top right corner).
+        It set to "random" by default.
+        """
         if _vertices is None:
             _vertices = []
-        self.dim = _dim if _dim else (100, 100)
+        self.dimension = _dimension if _dimension else (100, 100)
         self.center_point = Point(_center_point)
         self.num_of_vertices = _num_of_vertices
         if state == "debug":
@@ -197,6 +231,7 @@ class Polygon:
 
         self.vertices = self.generate_vertices() if not _vertices else _vertices
 
+    # getters and setters.
     def get_center(self):
         return self.center_point
 
@@ -215,6 +250,7 @@ class Polygon:
     def set_vertices(self, vertices):
         self.vertices = vertices
 
+    # class functions
     def generate_vertices(self):
         """
         class function that generate polygon vertexes.
@@ -232,8 +268,8 @@ class Polygon:
             y = int(self.center_point.get_coordinates()[1] + radius * math.sin(direction))
 
             # check if not out of bounds of the map.
-            x = min(self.dim[0], max(0, x))
-            y = min(self.dim[1], max(0, y))
+            x = min(self.dimension[0], max(0, x))
+            y = min(self.dimension[1], max(0, y))
 
             # add the vertex to the verticesList.
             vertices_list.append(Point((x, y)))
@@ -242,6 +278,10 @@ class Polygon:
 
 
 class ControlManager:
+    """
+    A class that serves as a user interface for creating map type objects
+    and managing the communication between the 2 parts of the project.
+    """
 
     def __init__(self):
         self.map_list = []
@@ -260,7 +300,7 @@ class ControlManager:
         """
         return self.map_list
 
-    def visual_maps(self, _map_list, is_polygon):  # TODO remove los
+    def visual_maps(self, _map_list, is_polygon):
         """
         Visualization of each Map object from map_list one at a time using visualization method.
         """
@@ -272,23 +312,24 @@ class ControlManager:
         """
         Visualization of Map object.
 
-        :param is_from_input:
         :param _map: Map object to show on plot.
+        :param is_from_input: A flag describing whether the resulting map object
+                is from a draw or a receiver from the reading xml.
         """
         fig, ax = plt.subplots()
 
         # plot polygon representation
         for poly in _map.polygons:
-            if is_from_input:
+            if is_from_input:  # plot for reading from xml.
                 ControlManager.visual_los(ax, _map.get_start_point())
                 for ver in poly.get_vertices():
                     ControlManager.visual_los(ax, ver)
                 ControlManager.visual_obstacle(ax, poly)
 
-            else:
+            else:  # plot for drawn map.
                 ControlManager.visual_polygon(ax, poly)
-
-            ControlManager.visual_routh(ax, _map.get_routh())
+        if is_from_input:  # plot for reading from xml.
+            ControlManager.visual_routh(ax, _map.get_routh())  # Show routh.
 
         ax.plot(_map.start_point.get_coordinates()[0], _map.start_point.get_coordinates()[1], 'o',
                 color="gold")  # plot start point
@@ -302,6 +343,11 @@ class ControlManager:
 
     @staticmethod
     def visual_polygon(ax, poly):
+        """
+        A helper function that plots a drawn polygon type object.
+        :param ax: subplots reference to add objects to.
+        :param poly: polygon object to plot.
+        """
         ax.plot(poly.center_point.get_coordinates()[0], poly.center_point.get_coordinates()[1], 'o', color="black")
         circle_plot = plt.Circle(poly.center_point.get_coordinates(), poly.maxRad, fill=False, color="green")
 
@@ -310,11 +356,16 @@ class ControlManager:
             ax.plot(ver.get_coordinates()[0], ver.get_coordinates()[1], 'o', color="blue")
 
     @staticmethod
-    def visual_obstacle(ax, poly):
+    def visual_obstacle(ax, obstacle):
+        """
+        A helper function that plots a polygon object from the xml .
+        :param ax: subplots reference to add objects to.
+        :param obstacle: obstacle object to plot.
+        """
         xs = []
         ys = []
 
-        for val in poly.get_vertices():
+        for val in obstacle.get_vertices():
             xs.append(val.get_coordinates()[0])
             ys.append(val.get_coordinates()[1])
         if xs and ys:
@@ -327,6 +378,11 @@ class ControlManager:
 
     @staticmethod
     def visual_los(ax, sp):
+        """
+        A helper function that plots a line of sight from the xml .
+        :param ax: subplots reference to add objects to.
+        :param sp: point to plot the line of sight
+        """
         los = sp.get_line_of_sight()
         x, y = sp.get_coordinates()
         if los:
@@ -337,6 +393,12 @@ class ControlManager:
 
     @staticmethod
     def visual_routh(ax, routh):
+        """
+        A helper function that plots a routh path from the xml .
+
+        :param ax: subplots reference to add objects to.
+        :param routh: An ordered list of nodes from the start node to the goal node.
+        """
         xs = []
         ys = []
         for ver in routh:
@@ -371,7 +433,7 @@ class ControlManager:
 
         :param _map_name: number of map in the list for loop tracking.
         :param _map: Map object to add to file.
-        :param _maps_xml: xml tree object to make sub element to. 
+        :param _maps_xml: xml tree object to make sub element to.
         """
         map_xml = SubElement(_maps_xml, 'Map', name=str(_map_name))
         weight = SubElement(map_xml, 'Weight')
@@ -489,11 +551,11 @@ if __name__ == "__main__":
     _out_path = path.join(os.getcwd(), "Python_output.xml")
     _in_path = path.join(os.getcwd(), "cpp_output.xml")
     control = ControlManager()  # create control object for data passing.
-    # control.add_map(Map(state="debug", _polygons=[Polygon(_dim=(100,100),_center_point=(25,35), _num_of_vertices=3, _max_rad=25)]))  # add new random Map to map_list.
     control.add_map(Map(state="debug",
-                        _polygons=[Polygon(_dim=(100, 100), _center_point=(25, 35), _num_of_vertices=20, _max_rad=25),
-                                   Polygon(_dim=(100, 100), _center_point=(75, 65), _num_of_vertices=20,
-                                           _max_rad=25)]))  # add new random Map to map_list.
+                        _polygons=[
+                            Polygon(_dimension=(100, 100), _center_point=(25, 35), _num_of_vertices=20, _max_rad=25),
+                            Polygon(_dimension=(100, 100), _center_point=(75, 65), _num_of_vertices=20,
+                                    _max_rad=25)]))  # add new Map to map_list.
     # control.add_map(Map(state="debug"))  # add new random Map to map_list.
     control.add_map(Map(state="random"))  # add new random Map to map_list.
     control.exe_program(_out_path, _in_path)  # create input file ,compile the algorithm program and runs it.

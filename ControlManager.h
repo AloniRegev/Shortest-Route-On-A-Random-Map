@@ -10,28 +10,19 @@
 #include "Map.h"
 
 class ControlManager{
-private:
-    //std::vector<Map> maps;
-    
+public:    
+    /// output and input xml files. ///
+    void readXML(const char * path, std::vector<Map> &maps); //Read and create map element from given xml file path.
+    void writeXML(const char * path, std::vector<Map>& maps); //A function that creates a new xml file for the received map object.
 
-public:
-    /*getters and setters*/
-    //std::vector<Map>& getMaps(){return this->maps;}
-    
-    /*output and input xml files.*/
-    void readXML(const char * path, std::vector<Map> &maps);
-    void writeXML(const char * path, std::vector<Map>& maps);
+    /// ConvexHull ///
+    std::vector<Point> ConvexHull(std::vector<Point> points); //A function that creates a convex polygon from a general polygon it receives.
 
-    /*ConvexHull*/
-    std::vector<Point> ConvexHull(std::vector<Point> points);
-    //void ConvexHullMaps(std::vector<Map>&maps);
+    /// line of sight ///
+    std::vector<Point> lineOfSight (Map &map, Point &startPoint); // A function that finds for the current point all the other points that are in its line of sight.
 
-    /* line of sight*/
-    std::vector<Point> lineOfSight (Map &map, Point &startPoint);
-    //void creatGraph(Map& map);
-
-    /*find the best routh from start point to target point*/
-    std::vector<Point> aStar(Point& start, Point target, Map& map);
+    /// The easiest route ///
+    std::vector<Point> aStar(Point& start, Point target, Map& map); //A function to implement an A* algorithm that finds the easiest route between a start point and a target point.
 
 };
 

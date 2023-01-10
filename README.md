@@ -20,9 +20,11 @@ avoiding the obstacles along the way.
    ```
 2. C++:
    ```
+   tinyxml2
    g++ compiler
    Makefile
    ```
+   * The project must include the tinyxml2.cpp tinyxml2.h files that can be found [here](https://github.com/leethomason/tinyxml2).
 
 ### Logic operations:
 The project is divided into 2 parts:
@@ -200,7 +202,7 @@ as well as various points of polygons.
      Each object contains the drawn points read from the xml file.
      * `Obstacle.cpp` `Obstacle.h` - A class that describes an object of type **obstacle**. Inherited from the **Polygon** class.
      Each object that contains its polygon finds its convex representation and stores its values as the counter-clockwise arranged points.
-     * `tinyxml2.cpp` `tinyxml2.h` - Open source C++ XML parser. About the project in the [link](https://github.com/leethomason/tinyxml2). 
+     * `tinyxml2.cpp` `tinyxml2.h` - Open source C++ XML parser. More about the project in [here](https://github.com/leethomason/tinyxml2). 
 
 ## Outputs examples:
 1. ### Example 1:
