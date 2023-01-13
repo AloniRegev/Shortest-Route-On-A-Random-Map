@@ -15,7 +15,7 @@ private:
     std::unordered_map<std::string, std::vector<Point>> lineOfSightTable;
 public:
 
-    /// output and input xml files. ///
+    /// output and input xml files ///
     void readXML(const char * path); //Read and create map element from given xml file path.
     void writeXML(const char * path); //A function that creates a new xml file for the received map object.
 
