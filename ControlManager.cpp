@@ -462,6 +462,7 @@ std::vector<Point> reconstruct_path(Point *input, std::unordered_map<std::string
             current = &cameFrom[current->toString()];
             total_path.push_back(*current);
         }
+        std::reverse(total_path.begin(), total_path.end());
         return total_path;
 }
 
