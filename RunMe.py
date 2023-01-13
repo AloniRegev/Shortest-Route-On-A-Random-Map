@@ -522,7 +522,7 @@ class ControlManager:
         return map_list
 
     @staticmethod
-    def exe_program(_out_path: object, _in_path: object):
+    def exe_program(_out_path: object, _in_path: object, state="random"):
         """
         function that creates the xml input file for the algorithm program, compile  the algorithm program cpp file
         and runs it with it's xml as input.
@@ -532,7 +532,7 @@ class ControlManager:
         """
         control.write_xml(_out_path)  # create input file for the algorithm program.
         try:
-            if not os.path.exists(path.join(os.getcwd(), "findBestRouth.exe")):
+            if state == "debug" or not os.path.exists(path.join(os.getcwd(), "findBestRouth.exe")):
                 os.system("make")  # compile algorithm program c++ file.
 
             try:
@@ -558,7 +558,7 @@ if __name__ == "__main__":
                                     _max_rad=25)]))  # add new Map to map_list.
     # control.add_map(Map(state="debug"))  # add new random Map to map_list.
     control.add_map(Map(state="random"))  # add new random Map to map_list.
-    control.exe_program(_out_path, _in_path)  # create input file ,compile the algorithm program and runs it.
+    control.exe_program(_out_path, _in_path, state="debug")  # create input file ,compile the algorithm program and runs it.
     control.visual_maps(control.get_map_list(), is_polygon=False)  # visual all Maps in map_list.
     received_map_list = control.read_xml(_in_path)  # read xml file and plot map of it.
     control.visual_maps(received_map_list, is_polygon=True)

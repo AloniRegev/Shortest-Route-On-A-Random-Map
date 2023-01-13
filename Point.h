@@ -28,14 +28,9 @@ class Point{
             return Point(other);
         }*/
 
-        /*bool operator()(const Point& other) const {
-            return(this->getF() == other.getF() && this->getY() == other.getY());
-        };*/
-
         int getX()const{return this->x;}
         int getY()const{return this->y;}
 
-        //std::vector<Point> getPahts() const { return this->paths; }
         std::vector<Point> getPahts()  { return this->lineOfSight; }
 
         void setPaths(std::vector<Point> lineOfSight) {
@@ -45,16 +40,6 @@ class Point{
                 this->lineOfSight.push_back(ver);
             }
         } 
-
-        /* Point* getParent() { return this->parent; }
-
-        double getG()const { return this->g; }
-        void setG(double g) { this->g = g; }
-        double getH()const { return this->h; }
-        void setH(double h) { this->h = h; }
-        double getF()const { return this->f; }
-        void setF(double f) { this->f = f; }*/
-
 
         std::string toString() { return "(" + std::to_string(getX()) + ", " + std::to_string(getY()) + ")"; }
         bool prtCmp(const Point & other) const{

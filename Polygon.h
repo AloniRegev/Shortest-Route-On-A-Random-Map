@@ -4,7 +4,7 @@
 class Polygon{
     private:
         const int numOfVertices;
-        const std::vector<Point> vertexes;
+        const std::vector<Point> vertexes; 
 
 
     public:

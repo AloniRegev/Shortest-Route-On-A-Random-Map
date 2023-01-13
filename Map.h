@@ -15,17 +15,25 @@ class Map{
         Map( int _weight,  int _height,  Point _startPoint,  Point _targetPoint, std::vector<Obstacle>& _obstacles)
             :weight(_weight), height(_height), startPoint(_startPoint), targetPoint(_targetPoint), obstacles(_obstacles){};
 
+        /// Getters and setters ///
         int getWeight()const{return this->weight;}
         int getHeight()const{return this->height;}
-        Point& getStartPoint(){return this->startPoint;} // Point& getStartPoint() const {return this->startPoint;} // need to be const
+        
+        Point& getStartPoint(){return this->startPoint;} 
+        // Point& getStartPoint() const {return this->startPoint;} // need to be const
+        
         //Point& getTargetPoint(){return this->targetPoint;} 
         Point getTargetPoint() const {return this->targetPoint;} // need to be const
-        std::vector<Obstacle> &getObstacles(){return this->obstacles;} // std::vector<Obstacle> &getObstacles() const {return this->obstacles;} // need to be const
+        
+        std::vector<Obstacle> &getObstacles(){return this->obstacles;} 
+        // std::vector<Obstacle> &getObstacles() const {return this->obstacles;} // need to be const
+
         std::vector<Point> getRoute()const { return this->route; }
-        void setRoute(std::vector<Point> route) {  
+        
+        void setRoute(std::vector<Point> route) {  //deep copy for route.
             this->route.clear();
             for (Point point : route) {
-                Point ver(point.getX(), point.getY()); // TODO remove
+                Point ver(point.getX(), point.getY());
                 this->route.push_back(ver);
             }
         }

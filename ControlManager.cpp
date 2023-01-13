@@ -11,7 +11,7 @@
  * @param path - Address from which the xml file is read.
  * @param maps - A map object to which the value is saved.
  */
-void ControlManager::readXML(const char* path, std::vector<Map> &maps) {
+void ControlManager::readXML(const char* path) {
     tinyxml2::XMLDocument doc;
     doc.LoadFile(path);
     tinyxml2::XMLElement* pRootElement = doc.RootElement();
@@ -98,7 +98,7 @@ void addLosToXML(tinyxml2::XMLDocument& doc, tinyxml2::XMLElement*& root, std::v
  * @param path - Address from which we whant to save our new xml file.
  * @param maps - A map object to which the values are written.
  */
-void ControlManager::writeXML(const char* path, std::vector<Map>& maps) {
+void ControlManager::writeXML(const char* path) {
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLElement* pRoot = doc.NewElement("Root");
     doc.InsertFirstChild(pRoot);
@@ -124,13 +124,14 @@ void ControlManager::writeXML(const char* path, std::vector<Map>& maps) {
         //insert start point
         tinyxml2::XMLElement* pStartPoint = doc.NewElement("StartPoint");
         addPointToXML(doc, pStartPoint, map.getStartPoint());
-        addLosToXML(doc, pStartPoint, lineOfSight(map, map.getStartPoint()));
+        if (lineOfSightTable.find(map.getStartPoint().toString()) != lineOfSightTable.end()) {
+            addLosToXML(doc, pStartPoint, lineOfSightTable[map.getStartPoint().toString()]);
+        }
         pMap->InsertEndChild(pStartPoint);
 
         //insert target point
         tinyxml2::XMLElement* pTargetPoint = doc.NewElement("TargetPoint");
         addPointToXML(doc, pTargetPoint, map.getTargetPoint());
-        //addLosToXML(doc, pTargetPoint, lineOfSight(map, map.getTargetPoint()));
         pMap->InsertEndChild(pTargetPoint);
 
         //insert obstacles;
@@ -150,7 +151,9 @@ void ControlManager::writeXML(const char* path, std::vector<Map>& maps) {
                 pVertex->SetAttribute("name", nameConvex++);
 
                 addPointToXML(doc, pVertex, convex);
-                addLosToXML(doc, pVertex, lineOfSight(map, convex));
+                if (lineOfSightTable.find(convex.toString()) != lineOfSightTable.end()) {
+                    addLosToXML(doc, pVertex, lineOfSightTable[convex.toString()]);
+                }
 
                 pVertexes->InsertEndChild(pVertex);
             }
@@ -407,6 +410,22 @@ std::vector<Point> ControlManager::lineOfSight(Map& map, Point& currPoint) {
     return los;
 }
 
+/*
+ * Creating a full graph for the map, for visualizing the arcs in the graph.
+ * Initializes a hashmap for tracking the line of sight of each point.
+ */
+void ControlManager::findFullGraph() {
+    for (Map& map : maps) {             // creats route for the map.
+        lineOfSightTable[map.getStartPoint().toString()] = lineOfSight(map, map.getStartPoint());
+
+        for (Obstacle& obstacle : map.getObstacles()) {
+            for (Point& point : obstacle.getConvexVertexes()) {
+                lineOfSightTable[point.toString()] = lineOfSight(map, point);
+            }
+        }
+    }
+}
+
 
 /// The easiest route ///
 
@@ -497,4 +516,17 @@ std::vector<Point> ControlManager::aStar(Point& start, Point target, Map& map) {
 
     std::vector<Point> result;
     return result;
+}
+
+
+/*
+ * Initializes the easiest route in the internal map object.
+ */
+void ControlManager::findRoute() {
+    for (Map& map : maps) {             // creats route for the map.
+        std::vector<Point> route = aStar(map.getStartPoint(), map.getTargetPoint(), map);
+        map.setRoute(route);
+        for (Point& ptr : route)
+            std::cout << ptr.toString() << std::endl;
+    }
 }

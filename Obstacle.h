@@ -7,5 +7,6 @@ class Obstacle : public Polygon{
     public:
         Obstacle(Polygon &polygon, std::vector<Point> vec) :Polygon(polygon), convexVertexes(vec) {};
 
-        std::vector<Point> &getConvexVertexes() { return this->convexVertexes; } // std::vector<Point> getConvexVertexes()const{return this->convexVertexes;} // need to be const
+        std::vector<Point> &getConvexVertexes() { return this->convexVertexes; } 
+        // std::vector<Point> getConvexVertexes()const{return this->convexVertexes;} // need to be const
 };
