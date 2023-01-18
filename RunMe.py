@@ -527,8 +527,10 @@ class ControlManager:
         function that creates the xml input file for the algorithm program, compile  the algorithm program cpp file
         and runs it with it's xml as input.
 
+
         :param _out_path: name for the xml file to be created as the input file of the algorithm program.
         :param _in_path: name for the xml file to be received from the algorithm program.
+        :param state:  flag for the function to control if in debug or random mode.
         """
         control.write_xml(_out_path)  # create input file for the algorithm program.
         try:
