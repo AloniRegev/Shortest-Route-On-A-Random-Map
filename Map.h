@@ -4,8 +4,8 @@ class Map{
     private:
         const int width;
         const int height;
-        //Point startPoint; 
-        const Point startPoint; // need to be const
+        Point startPoint; 
+        //const Point startPoint; // need to be const
         
         //Point targetPoint; 
         const Point targetPoint; // need to be const
@@ -14,15 +14,15 @@ class Map{
 
     
     public:
-        Map( int _weight,  int _height,  Point _startPoint,  Point _targetPoint, std::vector<Obstacle>& _obstacles)
-            :width(_weight), height(_height), startPoint(_startPoint), targetPoint(_targetPoint), obstacles(_obstacles){};
+        Map( int _width,  int _height,  Point _startPoint,  Point _targetPoint, std::vector<Obstacle>& _obstacles)
+            :width(_width), height(_height), startPoint(_startPoint), targetPoint(_targetPoint), obstacles(_obstacles){};
 
         /// Getters and setters ///
-        int getWeight()const{return this->width;}
+        int getWidth()const{return this->width;}
         int getHeight()const{return this->height;}
         
-        //Point& getStartPoint(){return this->startPoint;} 
-         Point getStartPoint() const {return this->startPoint;} // need to be const
+        Point& getStartPoint(){return this->startPoint;} 
+         //Point getStartPoint() const {return this->startPoint;} // need to be const
         
         //Point& getTargetPoint(){return this->targetPoint;} 
         Point getTargetPoint() const {return this->targetPoint;} // need to be const

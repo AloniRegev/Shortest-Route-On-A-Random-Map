@@ -20,7 +20,7 @@ void ControlManager::readXML(const char* path) {
         tinyxml2::XMLElement* pMap = pRootElement->FirstChildElement("Maps")->FirstChildElement("Map"); // pointer to the first map object data.
         while (pMap != NULL) {
             /* get map object attributes */
-            int width = atoi(pMap->FirstChildElement("Weight")->GetText());
+            int width = atoi(pMap->FirstChildElement("Width")->GetText());
             int height = atoi(pMap->FirstChildElement("Height")->GetText());
             Point startPoint = Point(atoi(pMap->FirstChildElement("StartPoint")->FirstChildElement("X")->GetText()), atoi(pMap->FirstChildElement("StartPoint")->FirstChildElement("Y")->GetText()));
             Point targetPoint = Point(atoi(pMap->FirstChildElement("TargetPoint")->FirstChildElement("X")->GetText()), atoi(pMap->FirstChildElement("TargetPoint")->FirstChildElement("Y")->GetText()));
@@ -111,10 +111,10 @@ void ControlManager::writeXML(const char* path) {
         tinyxml2::XMLElement* pMap = doc.NewElement("Map");
         pMap->SetAttribute("name", mapName++);
 
-        //insert weight value
-        tinyxml2::XMLElement* pWeight = doc.NewElement("Weight");
-        pWeight->SetText(map.getWeight());
-        pMap->InsertEndChild(pWeight);
+        //insert width value
+        tinyxml2::XMLElement* pWidth = doc.NewElement("Width");
+        pWidth->SetText(map.getWidth());
+        pMap->InsertEndChild(pWidth);
 
         //insert height value
         tinyxml2::XMLElement* pHeight = doc.NewElement("Height");
@@ -416,8 +416,7 @@ std::vector<Point> ControlManager::lineOfSight(Map& map, Point& currPoint) {
  */
 void ControlManager::findFullGraph() {
     for (Map& map : maps) {             // creats route for the map.
-        Point startPoint= map.getStartPoint();
-        lineOfSightTable[map.getStartPoint().toString()] = lineOfSight(map, startPoint);
+        lineOfSightTable[map.getStartPoint().toString()] = lineOfSight(map, map.getStartPoint());
 
         for (Obstacle& obstacle : map.getObstacles()) {
             for (Point& point : obstacle.getConvexVertexes()) {
@@ -526,8 +525,7 @@ std::vector<Point> ControlManager::aStar(Point& start, Point target, Map& map) {
  */
 void ControlManager::findRoute() {
     for (Map& map : maps) {             // creats route for the map.
-        Point startPoint = map.getStartPoint();
-        std::vector<Point> route = aStar(startPoint, map.getTargetPoint(), map);
+        std::vector<Point> route = aStar(map.getStartPoint(), map.getTargetPoint(), map);
         map.setRoute(route);
         for (Point& ptr : route)
             std::cout << ptr.toString() << std::endl;

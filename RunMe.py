@@ -61,7 +61,7 @@ class Map:
         If set to "random" then it wil generate random points.
         If set to "debug" then it fix the
             start_point to (0, 0) (bottom left corner)
-            and target_point to (max_weight, max_height) (top right corner).
+            and target_point to (max_width, max_height) (top right corner).
         It set to "random" by default.
         """
         self.routh = None
@@ -104,7 +104,7 @@ class Map:
     def set_height(self, height):
         self.height = height
 
-    def get_weight(self):
+    def get_width(self):
         return self.width
 
     def get_start_point(self):
@@ -216,7 +216,7 @@ class Polygon:
         If set to "random" then it wil generate random points.
         If set to "debug" then it fix the
             start_point to (0, 0) (bottom left corner)
-            and target_point to (max_weight, max_height) (top right corner).
+            and target_point to (max_width, max_height) (top right corner).
         It set to "random" by default.
         """
         if _vertices is None:
@@ -436,8 +436,8 @@ class ControlManager:
         :param _maps_xml: xml tree object to make sub element to.
         """
         map_xml = SubElement(_maps_xml, 'Map', name=str(_map_name))
-        weight = SubElement(map_xml, 'Weight')
-        weight.text = str(_map.get_weight())
+        width = SubElement(map_xml, 'Width')
+        width.text = str(_map.get_width())
         height = SubElement(map_xml, 'Height')
         height.text = str(_map.get_height())
 
@@ -490,7 +490,7 @@ class ControlManager:
         map_list = []
 
         for m in root.iter('Map'):
-            weight = int(m.find("./Weight").text)
+            width = int(m.find("./Width").text)
             height = int(m.find("./Height").text)
             sp_los = []
             for sp in m.iter("StartPoint"):
@@ -516,7 +516,7 @@ class ControlManager:
                 for route_ver in r.iter('Vertex'):
                     route.append(Point((int(route_ver.find("./X").text), int(route_ver.find("./Y").text))))
 
-            _map = Map(weight, height, start_point, target_point, obstacles, route)
+            _map = Map(width, height, start_point, target_point, obstacles, route)
             map_list.append(_map)
 
         return map_list
